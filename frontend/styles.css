@@ -2,6 +2,7 @@
 body{
     margin: 0 0 0 0;
     padding: 0 0 0 0;
+    font-family: sans-serif;
 }
 
 div#page{
@@ -12,12 +13,12 @@ div#page{
 
 div#panel{
     
-    width: 260px;
+    width: 222px;
     height: 100vh;
     /* margin-bottom: 0; */
     background-color: #fff;
-    /* overflow: hidden; */
-    padding: 1rem;
+    overflow: hidden;
+    padding: 1.2rem;
 
 
     display: flex;
@@ -32,6 +33,11 @@ div#logo{
     align-items: center;
     gap: 0.7rem;
 }
+
+div#logo h1{
+    color: #333c4e;
+}
+
 div#logo svg{
     color: #fff;
     width: 20px;
@@ -82,28 +88,38 @@ button#newchat{
 
 div.recentChatList{
     flex: 2;
-    /* overflow-y: auto; */
+    
+    
+    overflow-y: auto;
     /* min-height: 0; */
     margin-top: 2rem;
     display: flex;
     flex-direction: column;
     color: #6b7280;
     justify-content: flex-start;
-    gap: 2rem;
+    align-items: center;
+    gap: 1.5rem;
+    /* margin: 1rem; */
+    
 }
 
 div.recentChat{
-    width: 200px;
-    text-wrap: nowrap;
-    overflow: hidden;
+    font-size: .875rem;
+    font-weight: 400;
     display: flex;
     align-items: center;
     border-radius: 0.75rem;
+    padding: 10 16 10 16;
     white-space-collapse: collapse;
 }
 
 div.recentChat a{
     all: unset;
+    width: 200px;
+    /* max-width: 100%; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 div#sidebar-fotter{
@@ -178,7 +194,7 @@ div#chatarea-1{
     flex-direction: column;
     align-items: center;
     background-color: #f0f2f5;
-    /* overflow: hidden; */
+    overflow-y: auto;
 }
 
 div#header-chatarea{
@@ -227,13 +243,13 @@ div#greeting{
 }
 
 #greeting-1{
-    font-size: 4rem;
+    font-size: 3.4rem;
     font-weight: 700;
     color: #333c4e;
 }
 
 #greeting-2{
-    font-size: 4rem;
+    font-size: 3.4rem;
     font-weight: 700;
 
     /* this portion of gradientifying color was googled by me  */
@@ -250,17 +266,67 @@ div#baseline{
     font-family: sans-serif;
 }
 
+
+
+
+
+
+
 div#model-select{
-    font-size: 20px;
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 40px;
+    font-size: 16px;
+    color: #6b7280;
     background-color: #fff;
     border-radius: 1rem;
     margin-top: 30px;
+    overflow-x: auto;
+    /* max-width: 100%; */
+    justify-content: center;
+    padding: 0.375rem 1rem;
+    border: 1px solid #e0e2e7;
+    text-align: center;
+}
+
+label.model div{
+    /* align-self: stretch; */
+    height: 37px;
+    border-radius: 0.5rem;
+    line-height: 35px;
+    padding: 0 9px;
+}
+
+
+
+.model-name-auto{
     display: flex;
     align-items: center;
-    overflow-x: auto;
-    max-width: 100%;
     justify-content: center;
-    gap: 4rem;
-    padding: 0.375rem;
-    border: 1px solid #e0e2e7;
+    gap: 7px;
 }
+
+div#line{
+    margin-left: -30px;
+    margin-right: -30px;
+}
+
+.model-name-auto svg{
+    width: 25px;
+}
+
+
+
+
+input[type="radio"]:checked + div{
+    background-color: #1a2e6b;
+    color: #fff;
+    /* padding-left: 7px;
+    padding-right: 7px;  */
+}
+.model input{
+    display: none;
+}
+
