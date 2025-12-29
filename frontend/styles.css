@@ -7,7 +7,7 @@ body{
 div#page{
     display: flex;
     height: 100vh;
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 
 div#panel{
@@ -130,7 +130,39 @@ div#settings div#settigs-icon{
     width: 25px;
 }
 
+div#user-info{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    gap: 1rem;
+    padding-left: 5px;
+    background-color: #f8fafc;
+    border: 1px solid #e0e2e7;
+}
 
+div#profilepic svg{
+    width: 25px;
+    padding: 0.3rem;
+    background-color: greenyellow;
+    border-radius: 50%;
+}
+
+div#userinfo{
+    display: flex;
+    flex-direction: column;
+}
+
+div#plan-details{
+    color: #6b7280;
+    font-size: 0.625rem;
+}
+
+div#userinfo div#name{
+    font-size: 0.75rem;
+}
 
 
 
