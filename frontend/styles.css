@@ -76,6 +76,52 @@ button#newchat{
     justify-content: flex-start;
 }
 
+div.recentChatList{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    color: #6b7280;
+    justify-content: flex-start;
+    gap: 2rem;
+}
+
+div.recentChat{
+    width: 200px;
+    text-wrap: nowrap;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border-radius: 0.75rem;
+    white-space-collapse: collapse;
+}
+
+div.recentChat a{
+    all: unset;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 div#sidebar-fotter{
     margin-top: auto;
     display: flex;
