@@ -6,5 +6,168 @@ body{
 
 div#page{
     display: flex;
+    height: 100vh;
+    /* overflow: hidden; */
 }
 
+div#panel{
+    width: 18vw;
+    height: 100vh;
+    background-color: #fff;
+    overflow: hidden;
+    padding: 1rem;
+
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+div#logo{
+    font-family: sans-serif;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+div#logo svg{
+    color: #fff;
+    width: 20px;
+    padding: .6rem;
+    background: linear-gradient(to bottom right,#14275e,#3557bb);
+    border-radius: .5rem;
+
+}
+
+div#newchat-recentChats{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div#newchat-button{
+    /* width: 300px; */
+    margin-top: 2rem;
+}
+
+div#newchat-plus svg{
+    margin-left: 1rem;
+    color: #fff;
+    width: 20px;
+}
+
+div#newchat-text{
+    margin-left: 1rem;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+button#newchat{
+    border: none;
+    width: 230px;
+    height: 50px;
+    border-radius: 0.75rem;
+    background-color: #1a2e6b;
+    box-shadow: 0 5px 10px grey ;
+    
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+div#sidebar-fotter{
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+div#newchat-recentChats{
+    display: flex;
+    flex-direction: column;
+}
+div.recentChatList{
+    display: flex;
+    flex-direction: column;
+}
+
+div#sidebar-fotter{
+    display: flex;
+    flex-direction: column;
+}
+
+div#settings{
+    display: flex;
+}
+
+div#user-info{
+    display: flex;
+}
+
+div#userinfo{
+    display: flex;
+    flex-direction: column;
+}
+
+
+div#chatarea-1{
+    /* change to 80 % if needed */
+    flex: 1;
+    height: 100vh;
+    /* chage the overflow to auto later on screen 2  */
+    overflow: hidden; 
+
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f2f5;
+}
+
+div#header-chatarea{
+    height: 10vh;
+
+    display: flex;
+
+}
+
+div#charareabutton{
+    margin-left: auto;
+    width: 5%;
+}
+
+div#main-area{
+    flex: 0 0 80%;
+}
+
+div#fotter-info{
+    flex: 0 0 10%;
+}
