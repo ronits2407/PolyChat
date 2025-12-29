@@ -99,35 +99,38 @@ div.recentChat a{
     all: unset;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 div#sidebar-fotter{
+    border-top: #6b7280;
     margin-top: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
+
+div#settings{
+    border-top: gray;
+}
+
+div#settings button#settings{
+    color: #6b7280;
+    font-size: 18px;
+    border: none;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #fff;
+
+    width: 230px;
+    height: 40px;
+    border-radius: 0.5rem;
+}
+
+div#settings div#settigs-icon{
+    width: 25px;
+}
+
+
 
 
 
