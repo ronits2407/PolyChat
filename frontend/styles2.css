@@ -474,8 +474,10 @@ div#chatbox{
 }
 
 div#seach-icon svg{
-    width: 30px;
+    width: 20px;
     color: #6b7280;
+    padding-left: 10px;
+    border-left: 1px solid grey;
 }
 div#seach-icon{
     /* margin-left: 21px; */
@@ -503,13 +505,14 @@ div#input-box input{
     
     border: none;
     
-    color: #333c4e;
+    color: #364970;
     outline: none;
+    
     height: 30px;
     /* padding: 0; */
     /* margin: 10px; */
     margin: 10px auto 10px 10px;
-    font-size: 21px;
+    font-size: 15px;
 }
 
 div#input-buttons{
