@@ -418,4 +418,64 @@ div#input-buttons{
 
 
 
+#mode-of-answer{
+    width: 60vw;
+    margin-top: 40px;
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    justify-content: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
 
+#summarise,#code,#breainstorm,#analyse-data {
+    border-radius: 1rem;
+    /* flex: 1 1 ; */
+    /* width: 150px; */
+    /* min-width: 150px; */
+    background-color: #fff;
+    
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+    border: 1px solid #e0e2e7;
+    /* box-shadow: 0 0 1px black; */
+    
+}
+
+#mode-of-answer button{
+    border-radius: 1rem;
+    padding: .7rem 1.9rem;
+    justify-self: stretch;
+    align-self: stretch;
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    gap: 8px;
+}
+
+#mode-of-answer .text{
+    color: #333c4e;
+}
+#mode-of-answer svg{
+
+    width: 20px;
+}
+
+#summarise svg{
+    color: #a855f7;
+}
+
+#code svg{
+    color: #22c55e;
+}
+
+#breainstorm svg{
+    color: #f97316;
+}
+
+#analyse-data svg{
+    color: #3b82f6;
+}
