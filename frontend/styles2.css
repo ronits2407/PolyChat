@@ -457,3 +457,122 @@ div.questions{
     color: rgb(83, 94, 117);
     line-height: 20px;
 }
+
+
+/* prompt area similar to screen 1 */
+
+div#chatbox{
+    display: flex;
+    border-radius: 0.75rem;
+    align-items: center;
+    background-color: #fff;
+    width: 870px;
+    margin-top: 20px;
+    height: 75px;
+    justify-self: center;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+div#seach-icon svg{
+    width: 30px;
+    color: #6b7280;
+}
+div#seach-icon{
+    /* margin-left: 21px; */
+}
+
+div#input-prompt{
+    flex: 1;
+    justify-self: stretch;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    /* justify-content: stretch; */
+}
+
+#input-box{
+    flex: 1;
+}
+
+div#input-box input{
+    /* flex: -1; */
+    
+    border: none;
+    
+    color: #333c4e;
+    outline: none;
+    height: 30px;
+    /* padding: 0; */
+    /* margin: 10px; */
+    margin: 10px auto 10px 10px;
+    font-size: 21px;
+}
+
+div#input-buttons{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+
+.attachment,.voice-typing{
+    height: 40px;
+    width: 40px;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #fff;
+}
+
+.attachment svg,.voice-typing svg{
+    width: 20px;
+    color: #6b7280;
+}
+
+.send svg{
+    width: 25px;
+}
+
+.send{
+    background-color: #1a2e6b;
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 7px;
+}
+
+#send{
+    margin-right: 40px;
+    width: 20px;
+}
+
+
+#voice-typing,#attachment{
+    width: 22px;
+    color: #6b7280;
+}
+
+#model-selection-dropdown{
+    display: flex;
+    align-items: center;
+    /* justify-content: space-around; */
+    align-self: stretch;
+}
+
+#model-selection-dropdown svg{
+    width: 15px;
+    color: #6b7280;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+#model-selection-dropdown select{
+    margin-right: 10px;
+    /* margin-left: 0; */
+    height: 60%;
+    width: 70px;
+}
+    

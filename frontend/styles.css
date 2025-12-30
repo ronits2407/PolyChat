@@ -368,23 +368,30 @@ div#seach-icon{
 }
 
 div#input-prompt{
+    flex: 1;
     display: flex;
     align-items: center;
     background: transparent;
     padding: 0;
     margin-top: 0;
     margin-bottom: 0;
+    /* justify-content:flex-end; */
+}
+div#input-box{
+    display: flex;
+    flex: 1;
 }
 
 div#input-box input{
+    flex: 1;
+    justify-self: stretch;
     
     border: none;
-    flex: 1;
     color: #333c4e;
     outline: none;
     height: 30px;
     /* padding: 0; */
-    margin: 10px;
+    margin: 10px 0px 10px 10px;
     font-size: 21px;
 }
 
