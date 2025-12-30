@@ -479,3 +479,37 @@ div#input-buttons{
 #analyse-data svg{
     color: #3b82f6;
 }
+
+
+#fotter-info{
+    margin-top: auto;
+    display: flex;
+    justify-self: center;
+    gap: 2rem;
+    margin-bottom: 22px;
+    align-items: center;
+}
+
+#fotter-info a{
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    color: #6b7280;
+    border: none;
+    background-color: transparent;
+
+}
+
+a#systemstatus{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#system-status-light{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #22c55e;
+}
