@@ -189,6 +189,8 @@ div#userinfo div#name{
 }
 
 
+/* chatarea-1 styling */
+
 div#chatarea-1{
     flex: 1;
     display: flex;

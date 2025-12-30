@@ -1,0 +1,303 @@
+/* Your CSS styles here */
+body{
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    font-family: sans-serif;
+}
+
+div#page{
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+div#panel{
+    
+    width: 222px;
+    height: 100vh;
+    /* margin-bottom: 0; */
+    background-color: #fff;
+    overflow: hidden;
+    padding: 1.2rem;
+
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+div#logo{
+    font-family: sans-serif;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+div#logo h1{
+    color: #333c4e;
+}
+
+div#logo svg{
+    color: #fff;
+    width: 20px;
+    padding: .6rem;
+    background: linear-gradient(to bottom right,#14275e,#3557bb);
+    border-radius: .5rem;
+
+}
+
+div#newchat-recentChats{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* min-height: 0; */
+}
+
+div#newchat-button{
+    /* width: 300px; */
+    margin-top: 2rem;
+}
+
+div#newchat-plus svg{
+    margin-left: 1rem;
+    color: #fff;
+    width: 20px;
+}
+
+div#newchat-text{
+    margin-left: 1rem;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+button#newchat{
+    border: none;
+    width: 230px;
+    height: 50px;
+    border-radius: 0.75rem;
+    background-color: #1a2e6b;
+    box-shadow: 0 5px 10px grey ;
+    
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+div.recentChatList{
+    flex: 2;
+    
+    
+    overflow-y: auto;
+    /* min-height: 0; */
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    color: #6b7280;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1.5rem;
+    /* margin: 1rem; */
+    
+}
+
+div.recentChat{
+    font-size: .875rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    border-radius: 0.75rem;
+    padding: 10 16 10 16;
+    white-space-collapse: collapse;
+}
+
+div.recentChat a{
+    all: unset;
+    width: 200px;
+    /* max-width: 100%; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div#sidebar-fotter{
+    border-top: #6b7280;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+div#settings{
+    padding-top: 10px;
+    border-top: 0.8px solid rgb(181, 173, 173);
+}
+
+div#settings button#settings{
+    color: #6b7280;
+    font-size: 18px;
+    border: none;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #fff;
+
+    width: 230px;
+    height: 40px;
+    border-radius: 0.5rem;
+}
+
+div#settings div#settigs-icon{
+    width: 25px;
+}
+
+div#user-info{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    gap: 1rem;
+    padding-left: 5px;
+    background-color: #f8fafc;
+    border: 1px solid #e0e2e7;
+}
+
+div#profilepic svg{
+    width: 25px;
+    padding: 0.3rem;
+    background-color: greenyellow;
+    border-radius: 50%;
+}
+
+div#userinfo{
+    display: flex;
+    flex-direction: column;
+}
+
+div#plan-details{
+    color: #6b7280;
+    font-size: 0.625rem;
+}
+
+div#userinfo div#name{
+    font-size: 0.75rem;
+}
+
+
+/* chatarea 2 styling */
+
+
+
+
+div#chatarea-2{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f2f5;
+    overflow-y: hidden;
+}
+
+div#header-conversation{
+    
+    /* make this unhidden dynamically, chage none => flex */
+    display: none;
+    
+    
+    /* width: 900px; */
+    align-self: stretch;
+    background-color: #fff;
+    /* margin-top: 20px; */
+    align-items: center;
+    justify-content: space-between;
+}
+
+div#chat-history-button svg{
+    width: 30px;
+    color: rgb(107 114 128);
+}
+
+div#chat-history-button{
+    /* margin-right: auto; */
+    margin-left: 10px;
+}
+
+div#logo-1{
+    margin-right: 20px;
+    font-family: sans-serif;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 5px 0;
+}
+
+div#logo-1 h1{
+    color: #333c4e;
+    font-size: 20px;
+}
+
+div#logo-1 svg{
+    color: #fff;
+    width: 20px;
+    padding: .6rem;
+    background: linear-gradient(to bottom right,#14275e,#3557bb);
+    border-radius: .5rem;
+
+}
+
+
+div#conversation{
+    /* margin-top: 70px; */
+    justify-self: center;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+div.response{
+    align-self: stretch;
+    padding: 50px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question{
+    align-self: stretch;
+    font-size: 40px;
+    font-weight: 750;
+    color: rgb(51 60 78);
+    letter-spacing: -1px;
+}
+
+div.response-info{
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div.feedback{
+    align-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.related-questions{
+    display: flex;
+    flex-direction: column;
+}
+
+div.questions{
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+}
