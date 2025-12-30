@@ -104,8 +104,6 @@ div.recentChatList{
 }
 
 div.recentChat{
-    font-size: .875rem;
-    font-weight: 400;
     display: flex;
     align-items: center;
     border-radius: 0.75rem;
@@ -115,6 +113,8 @@ div.recentChat{
 
 div.recentChat a{
     all: unset;
+    font-size: .875rem;
+    font-weight: 200;
     width: 200px;
     /* max-width: 100%; */
     white-space: nowrap;

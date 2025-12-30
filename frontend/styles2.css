@@ -85,7 +85,6 @@ button#newchat{
     align-items: center;
     justify-content: flex-start;
 }
-
 div.recentChatList{
     flex: 2;
     
@@ -104,8 +103,6 @@ div.recentChatList{
 }
 
 div.recentChat{
-    font-size: .875rem;
-    font-weight: 400;
     display: flex;
     align-items: center;
     border-radius: 0.75rem;
@@ -115,6 +112,8 @@ div.recentChat{
 
 div.recentChat a{
     all: unset;
+    font-size: .875rem;
+    font-weight: 200;
     width: 200px;
     /* max-width: 100%; */
     white-space: nowrap;
@@ -496,10 +495,11 @@ div#input-prompt{
 
 #input-box{
     flex: 1;
+    display: flex;
 }
 
 div#input-box input{
-    /* flex: -1; */
+    flex:1;
     
     border: none;
     
@@ -574,5 +574,21 @@ div#input-buttons{
     /* margin-left: 0; */
     height: 60%;
     width: 70px;
+    background-color: #fff;
+    border: none;
+    color: #3a507a;
+    font-weight: 600;
+    text-wrap: wrap;
 }
+
+#model-selection-dropdown::after {
+    color: #3a507a;
+    /* font-size: 12px; */
+    top: 50%;
+    border-radius: 2rem;
+    border: none;
+    background-color: #fff;
+    /* transform: translateY(-50%); */
+}
+
     
