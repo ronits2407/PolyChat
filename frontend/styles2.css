@@ -275,6 +275,7 @@ div.response{
     font-weight: 750;
     color: rgb(51 60 78);
     letter-spacing: -1px;
+    margin-bottom: 23px;
 }
 
 div.response-info{
@@ -284,12 +285,7 @@ div.response-info{
     align-items: center;
 }
 
-div.feedback{
-    align-self: stretch;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+
 
 div.related-questions{
     display: flex;
@@ -301,3 +297,99 @@ div.questions{
     display: flex;
     flex-wrap: wrap;
 }
+
+.model-info{
+    margin-left: 8px;
+    color: rgb(37, 48, 71);
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 0.7px solid #aeb1b7a7;
+    justify-content: space-between;
+}
+
+.model-used{
+    display: flex;
+    align-items: center;
+    gap: 1.3rem;
+    font-size: 14px;
+    font-weight: 100;
+    
+}
+
+.model-used svg{
+    width: 20px;
+}
+
+.utility-buttons{
+    display: flex;
+    gap: 1rem;
+}
+
+.utility-buttons svg{
+    width: 18px;
+}
+
+.utility-buttons button{
+    color: #6b7280;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.answer{
+    margin-top: 20px;
+    color: #6b7280;
+    font-size: 18px;
+    padding: 0 15px;
+    padding-bottom: 33px;
+}
+
+div.feedback{
+    align-self: stretch;
+    display: flex;
+    padding-left: 20px;
+    padding-right: 20px;
+    /* justify-content: space-between; */
+    gap: 1rem;
+    align-items: center;
+    padding-bottom: 35px;
+    border-bottom: 0.7px solid rgb(202, 194, 194);
+}
+
+
+div.feedback button{
+    background-color: #fff;
+    border-radius: 1rem;
+    color: rgb(107 114 128);
+    font-weight: 700;
+    font-size: .875rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    border: none;
+    /* border-color: rgb(224 226 231); */
+    /* border-width: 1px; */
+    box-shadow: 0px 0px 1px #6b7280;
+    gap: .3rem;
+    outline: none;
+
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+}
+
+.helpful-icon svg, .dislike svg, .shareimage svg{
+    align-self: center;
+    width: 20px;
+}
+
+button.helpful, button.dislike, button.share-response{
+    padding: 0 14px;
+}
+
+.share-response{
+    margin-left: auto;
+}
+
