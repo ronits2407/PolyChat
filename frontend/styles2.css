@@ -197,9 +197,11 @@ div#chatarea-2{
     flex: 1;
     display: flex;
     flex-direction: column;
+    /* justify-self: stretch; */
     align-items: center;
     background-color: #f0f2f5;
     overflow-y: hidden;
+
 }
 
 div#header-conversation{
@@ -253,11 +255,17 @@ div#logo-1 svg{
 
 div#conversation{
     /* margin-top: 70px; */
-    justify-self: center;
+    /* justify-self: center; */
+    
     align-self: stretch;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+div#conversation > div{
+    max-width: 100%;
 }
 
 div.response{
@@ -270,6 +278,8 @@ div.response{
 
 .question{
     align-self: stretch;
+    text-wrap: wrap;
+    flex-wrap: wrap;
     font-size: 40px;
     font-weight: 750;
     color: rgb(51 60 78);
@@ -327,6 +337,8 @@ div.response-info{
 }
 
 .answer{
+    align-self: stretch;
+    text-align: left;
     margin-top: 20px;
     color: #6b7280;
     font-size: 18px;

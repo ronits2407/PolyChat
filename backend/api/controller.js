@@ -1,30 +1,52 @@
-const OpenAI = require("openai");
-
-const { GoogleGenAI } = require("@google/genai");
-const { json } = require("express");
-const client = new OpenAI();
-const ai = new GoogleGenAI({});
-
 const handleChat = async (req, res) => {
   const { message, model } = req.body;
 
   try {
-    const { message } = req.body;
+    if (!message || !model) {
+      res.status(400).json({
+        error: "Message or model name not provided",
+      });
+      return;
+    }
+
+    const available_models = ["gemma:2b"];
+
+    if (!available_models.includes(model)) {
+      res.status(400).json({
+        error: "The model you requested is either not available or is invalid",
+      });
+      return
+    }
 
     const query = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: model, // or whichever model you pulled
+        model,
         prompt: message,
         stream: false,
       }),
     };
 
-    const response = await fetch("http://localhost:11434/api/generate",query);
+    const response = await fetch("http://localhost:11434/api/generate", query);
+    // console.log("Hello")
+    if (!response.ok) {
+      const error_details = await response.json();
+      res.status(400).json({
+        error: "An error occured while retrieving the response",
+        error_details,
+      });
+      return
+    }
 
-    const data = await response.json();
-    res.status(200).json(data);
+    const answer = await response.json();
+
+    res.status(200).json({
+      model,
+      "date-time": new Date(),
+      answer,
+    });
+    return
   } catch (error) {
     res
       .status(500)
