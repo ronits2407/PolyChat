@@ -287,17 +287,6 @@ div.response-info{
 
 
 
-div.related-questions{
-    display: flex;
-    flex-direction: column;
-}
-
-div.questions{
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-}
-
 .model-info{
     margin-left: 8px;
     color: rgb(37, 48, 71);
@@ -393,3 +382,78 @@ button.helpful, button.dislike, button.share-response{
     margin-left: auto;
 }
 
+
+
+div.related-questions{
+    align-self: stretch;
+    display: flex;
+    margin-top: 40px;
+    flex-direction: column;
+}
+
+div.questions{
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.related-questions .heading{
+    font-size: 20px;
+    letter-spacing: 0px;
+    align-self: flex-start;
+    color: rgb(51 60 78);
+    letter-spacing: .1em;
+    font-weight: 700;
+    font-size: .875rem;
+    margin-bottom: 1rem;
+}
+
+.questions{
+    display: flex;
+    flex-wrap: wrap;
+    align-self: stretch;
+    /* gap: 1rem; */
+    justify-content: space-between;
+
+}
+
+.questions button{
+    width: 410px;
+    height: 75px;
+    overflow-y: hidden;
+    /* text-align: left; */
+    
+    /* background-color: #fff; */
+    /* box-shadow: 0 5px 10px grey; */
+    border: 0.7px solid rgb(187, 178, 178);
+    border-radius: 0.75rem;
+    align-items: center;
+}
+
+.questions button{
+    /* border: none; */
+    background-color: #fff;
+    /* border-radius: 0.75rem; */
+    display: flex;
+    /* align-items: center; */
+    /* gap: 2rem; */
+    justify-content: flex-start;
+}
+
+.right-arrow-symbol{
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.questions svg{
+    width: 10px;
+}
+
+.questions p{
+    margin-left: 15px;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(83, 94, 117);
+    line-height: 20px;
+}
