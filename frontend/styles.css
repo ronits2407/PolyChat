@@ -11,8 +11,10 @@ div#page{
     overflow: hidden;
 }
 
-div#panel{
-    
+
+
+
+div#panel{  
     width: 222px;
     height: 100vh;
     /* margin-bottom: 0; */
@@ -25,6 +27,7 @@ div#panel{
     flex-direction: column;
     justify-content: flex-start;
 }
+
 
 div#logo{
     font-family: sans-serif;
@@ -52,6 +55,8 @@ div#newchat-recentChats{
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: hidden;
+    
     /* min-height: 0; */
 }
 
@@ -74,8 +79,10 @@ div#newchat-text{
 }
 
 button#newchat{
+    /* margin-left: 4px;
+    margin-right: 4px; */
     border: none;
-    width: 230px;
+    width: 207px;
     height: 50px;
     border-radius: 0.75rem;
     background-color: #1a2e6b;
@@ -84,12 +91,20 @@ button#newchat{
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+button#newchat:hover{
+    background-color: #2c499f;
+}
+
+button#newchat:active{
+    transform: scale(.95);
 }
 
 div.recentChatList{
-    flex: 2;
-    
-    
+    flex: 1;
     overflow-y: auto;
     /* min-height: 0; */
     margin-top: 2rem;
@@ -98,7 +113,7 @@ div.recentChatList{
     color: #6b7280;
     justify-content: flex-start;
     align-items: center;
-    gap: 1.5rem;
+    /* gap: 1.5rem; */
     /* margin: 1rem; */
     
 }
@@ -107,23 +122,36 @@ div.recentChat{
     display: flex;
     align-items: center;
     border-radius: 0.75rem;
-    padding: 10 16 10 16;
+    padding: 5 16 5 16;
     white-space-collapse: collapse;
 }
 
 div.recentChat a{
     all: unset;
+    border-radius: 0.75rem;
     font-size: .875rem;
     font-weight: 200;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    
     width: 200px;
     /* max-width: 100%; */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 10px;
+    transition: all .2s;
+    cursor: pointer;
+}
+
+div.recentChat a:hover{
+    background-color: #f1f5f9;
+    color: #1a2e6b;
 }
 
 div#sidebar-fotter{
-    border-top: #6b7280;
+    border-top: 0.1px solid #b8bac0;
     margin-top: auto;
     display: flex;
     flex-direction: column;
@@ -148,6 +176,13 @@ div#settings button#settings{
     width: 230px;
     height: 40px;
     border-radius: 0.5rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+div#settings button#settings:hover{
+    background-color: #f1f5f9;
+    color: #1a2e6b;
 }
 
 div#settings div#settigs-icon{
@@ -206,7 +241,7 @@ div#header-chatarea{
     margin-top: 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 div#sidepane-toggle svg{
@@ -216,9 +251,23 @@ div#sidepane-toggle svg{
 div#sidepane-toggle{
     /* margin-right: auto; */
     margin-left: 10px;
+    margin-right: auto;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+div#sidepane-toggle:hover{
+    background-color: #bec2c9;
 }
 
+
+
 div#notifications{
+    margin-left: auto;
     margin-right: 20px;
 }
 
@@ -230,6 +279,13 @@ div#notifications{
     height: 40px;
     width: 40px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.notifications:hover{
+    color: #1a2e6b;
+    background-color: #f9fafb;
 }
 
 div#notifications svg{
@@ -333,21 +389,52 @@ div#line{
 }
 
 
+input[type="radio"] + div{
 
+    cursor: pointer;
+}
 
 input[type="radio"]:checked + div{
     background-color: #1a2e6b;
     color: #fff;
+    transition: 0.2s;
     /* padding-left: 7px;
     padding-right: 7px;  */
 }
+
+input[type="radio"]:checked + div:hover{
+    background-color: #2c499f;
+}
+
+input[type="radio"]:not(:checked) + div{
+    transition: 0.2s;
+    
+}
+
+input[type="radio"]:not(:checked) + div:hover{
+    background-color: #e3e6e9;
+}
+
 .model input{
     display: none;
 }
 
+div#chatbox:hover{
+    box-shadow: 0 0 25px rgba(64, 91, 100, 0.5);
+}
 
+div#chatbox:focus-within{
+    box-shadow: 0 0 35px rgba(16, 76, 128, 0.5);
+    /* border : 8px solid transparent; */
+}
 
 div#chatbox{
+    border: 5px solid transparent;
+    /* border: 5px solid transparent; */
+    box-shadow: 0 0 15px rgba(64, 91, 100, 0.5);
+    transition: 0.4s;
+
+
     display: flex;
     border-radius: 0.75rem;
     align-items: center;
@@ -403,7 +490,13 @@ div#input-buttons{
 }
 
 
+.attachment:hover,.voice-typing:hover{
+    background-color : #f1f5f9;
+    color : #1a2e6b;
+}
+
 .attachment,.voice-typing{
+    cursor: pointer;
     height: 40px;
     width: 40px;
     border: none;
@@ -420,7 +513,18 @@ div#input-buttons{
     width: 25px;
 }
 
+.send:hover{
+    background-color: #2c499f;
+}
+
+.send:active{
+    transform: scale(.95);
+}
+
 .send{
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
     background-color: #1a2e6b;
     color: #fff;
     border-radius: 0.5rem;
@@ -451,7 +555,19 @@ div#input-buttons{
     flex-wrap: wrap;
 }
 
+#mode-of-answer > div:hover{
+    border-color: rgba(26, 46, 107, .5);
+    background-color: #f9fafb;
+    color: #1a2e6b;
+}
+
+#mode-of-answer > div:hover svg{
+    transform: scale(1.1);
+}
+
+
 #summarise,#code,#breainstorm,#analyse-data {
+    transition: 0.2s;
     border-radius: 1rem;
     /* flex: 1 1 ; */
     /* width: 150px; */
@@ -482,7 +598,7 @@ div#input-buttons{
     color: #333c4e;
 }
 #mode-of-answer svg{
-
+    transition: 0.3s;
     width: 20px;
 }
 
@@ -502,6 +618,9 @@ div#input-buttons{
     color: #3b82f6;
 }
 
+#fotter-info a:hover{
+    color: #1a2e6b;
+}
 
 #fotter-info{
     margin-top: auto;
@@ -513,6 +632,7 @@ div#input-buttons{
 }
 
 #fotter-info a{
+    transition: 0.1s;
     font-size: 12px;
     text-decoration: none;
     text-align: center;

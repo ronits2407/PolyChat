@@ -6,7 +6,6 @@
     <title>PolyChat - Chat</title>
     <link rel="stylesheet" href="styles2.css" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   </head>
   <body>
     <!-- Your HTML content here -->
@@ -123,23 +122,23 @@
       </div>
 
       <div id="chatarea-2">
+        <div id="chat-history-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        </div>
         <div id="header-conversation">
-          <div id="chat-history-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          </div>
           <div id="logo-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +159,7 @@
         </div>
         <div id="conversation">
           <!-- <div id="responses"> -->
-          <div class="response question-1" style="display: none;">
+          <div class="response question-1" style="display: none">
             <div class="question">
               Explain the impact of quantum computing on encryption
             </div>
@@ -225,9 +224,7 @@
                 </div>
               </div>
               <div class="answer">
-                <div class="answer-content">
-                  
-                </div>
+                <div class="answer-content"></div>
               </div>
               <div class="feedback">
                 <div class="helpful">
@@ -553,32 +550,32 @@
               <option value="auto">Auto</option>
             </select>
           </div>
-          <div id="input-prompt">
-            <div id="seach-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </div>
-            <div id="input-box">
-              <input
-                type="text"
-                name="prompt"
-                id="prompt-text"
-                placeholder="Ask anything about your data..."
+
+          <div id="seach-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
               />
-            </div>
+            </svg>
           </div>
+          <div id="input-box">
+            <input
+              type="text"
+              name="prompt"
+              id="prompt-text"
+              placeholder="Ask anything about your data..." autocomplete="off"
+            />
+          </div>
+
           <div id="input-buttons">
             <div id="attachment">
               <button class="attachment">
@@ -638,112 +635,6 @@
             </div>
           </div>
         </div>
-
-        <!-- <div id="prompt-area">
-          <div class="input-box">
-            <div class="model-select-drop-down">
-              <select name="model-select" id="model-select">
-                <div class="sparkicon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-                    />
-                  </svg>
-                </div>
-                <option value="GPT-4o">Auto</option>
-                <option value="GPT-4o">GPT-4o</option>
-                <option value="Gemini">Gemini</option>
-                <option value="Claude">Claude</option>
-              </select>
-            </div>
-            <div class="text-input-box">
-              <div class="search-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                  />
-                </svg>
-              </div>
-              <div class="inputarea">
-                <input type="text" name="prompt" id="prompt" />
-              </div>
-            </div>
-            <div class="helper-buttons">
-              <div class="attachment">
-                <button class="attachment">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div class="voice-typing">
-                <button class="voice-typing">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div class="send-prompt">
-                <button class="send-prompt">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div> -->
       </div>
     </div>
 

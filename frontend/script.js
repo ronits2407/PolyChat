@@ -68,7 +68,7 @@ send_button.addEventListener( "click" , async () => {
   
   
   
-  const answer_text = marked.parse(answer["answer"]["response"])
+  const answer_text = marked.parse(answer["message"])
 
   answer_content.innerHTML = answer_text;
   questionId++;
@@ -104,7 +104,7 @@ prompt.addEventListener("keydown", async (evt) => {
   
   
   
-  const answer_text = marked.parse(answer["answer"]["response"])
+  const answer_text = marked.parse(answer["message"])
 
   answer_content.innerHTML = answer_text;
   questionId++;
@@ -117,12 +117,11 @@ prompt.addEventListener("keydown", async (evt) => {
 
 
 
+// for screen 2
 
-// for screen 1
 
-
-const chatarea1 = document.querySelector("#chatarea-1")
-const inputbox = chatarea1.querySelector("prompt-text")
+const chatarea1 = document.querySelector("#chatarea-2")
+const inputbox = chatarea1.querySelector("#prompt-text")
 
 inputbox.addEventListener("keydown",async (evt) => {
   if (evt.key != "Enter") {
@@ -135,4 +134,32 @@ inputbox.addEventListener("keydown",async (evt) => {
 
   
   
+})
+
+
+
+
+
+const panel = document.querySelector("#panel")
+const sidepanetoggle = document.querySelector("#chat-history-button");
+
+sidepanetoggle.addEventListener("click", () => {
+  console.log("Toggle button was clicked")
+  if (panel.style.display == "flex") {
+    panel.style.display = "none"
+  }
+  else{
+    panel.style.display = "flex"
+  }
+})
+
+
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768) {
+     panel.style.display = "none"
+  }
+  else{
+    panel.style.display = "flex"
+  }
 })
