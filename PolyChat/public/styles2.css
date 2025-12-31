@@ -356,16 +356,29 @@ div.response-info {
   width: 20px;
 }
 
+
 .utility-buttons {
-  display: flex;
-  gap: 1rem;
+    display: flex;
+    gap: 1rem;
 }
 
 .utility-buttons svg {
-  width: 18px;
+    width: 18px;
+}
+
+.utility-buttons button:hover{
+    background-color: rgb(241 245 249);
+    color: rgb(26 46 107);
+    transform: scale(1.1);
+}
+
+.utility-buttons button:active{
+    transform: scale(0.9);
 }
 
 .utility-buttons button {
+    transition: 0.2s;    
+    cursor: pointer;
   color: #6b7280;
   background-color: transparent;
   border: none;

@@ -2,7 +2,8 @@ const chatarea1 = document.querySelector("#chatarea-1")
 const inputbox = chatarea1.querySelector("#prompt-text")
 
 async function gotoscreen2(question) {
-  window.location.replace(`https://localhost:5500/frontend/screen2.html/ques="${encodeURIComponent(question)}`);
+  //${encodeURIComponent(question)}
+  window.location.replace(`https://localhost:5500`)
 }
 
 inputbox.addEventListener("keydown", (evt) => {

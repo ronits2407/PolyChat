@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+const path = require("path")
 dotenv.config();
 
 const express = require("express");
@@ -33,6 +34,7 @@ if (process.env.MONGODB_URI) {
 }
 
 app.use("/api", chatRoutes);
+app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {
   console.log(`PolyChat API server is running on port ${PORT}`);

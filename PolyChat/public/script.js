@@ -128,7 +128,7 @@ inputbox.addEventListener("keydown",async (evt) => {
     return
   }
   let content = inputbox.textContent;
-  if (!textContent) {
+  if (!content) {
     return
   }
 
@@ -162,4 +162,30 @@ window.addEventListener("resize", () => {
   else{
     panel.style.display = "flex"
   }
+})
+
+
+//=====================copy to clipboard logic
+async function copyToClip(id) {
+  const copid = document.querySelector(`.question-${id}`).querySelector(".answer");
+  try {
+    await navigator.clipboard.writeText(copid.textContent);
+  } catch (error) {
+    console.error("Failed to copy");
+  }
+}
+
+const copyButtons = document.querySelectorAll(".copy")
+console.log(copyButtons)
+
+copyButtons.forEach((button) => {
+  button.addEventListener("click",async (info) => {
+    let grandparent = info.target.parentElement.parentElement;
+    let grand_grandparent = grandparent.parentElement.parentElement;
+    let question = grand_grandparent.parentElement;
+    
+    let id = Number(question.classList[1].substring(9));
+    console.log(id)
+    await copyToClip(id);
+  })
 })
