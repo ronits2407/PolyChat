@@ -52,19 +52,8 @@
             </button>
           </div>
           <div class="recentChatList">
-            <div class="recentChat">
-              <a href="#">Quantum Computing</a>
-            </div>
-            <div class="recentChat">
-              <a href="#"
-                >Quantum fffffffffffffffffffffefefefefefefffefefuting</a
-              >
-            </div>
-            <div class="recentChat">
-              <a href="#">Quantum Computing</a>
-            </div>
-            <div class="recentChat">
-              <a href="#">Quantum Computing</a>
+            <div class="recentChat" style="display: none;">
+              <a href="#">Template chat</a>
             </div>
           </div>
         </div>
@@ -186,7 +175,8 @@
             </label>
             <div id="line">|</div>
             <label class="model">
-              <input type="radio" name="model" id="auto" checked/>
+              <!-- change id of this to auto afterwars -->
+              <input type="radio" name="model" id="gemma:2b" checked />
               <div class="model-name-auto">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -207,7 +197,6 @@
             </label>
           </div>
           <div id="chatbox">
-            
             <div id="input-prompt">
               <div id="seach-icon">
                 <svg
@@ -230,7 +219,9 @@
                   type="text"
                   name="prompt"
                   id="prompt-text"
-                  placeholder="Ask anything..." autocomplete="off"
+                  placeholder="Ask anything..."
+                  autocomplete="off"
+                  autofocus
                 />
               </div>
             </div>

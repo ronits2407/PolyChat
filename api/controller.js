@@ -1,9 +1,12 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const KeyWordMap = require("./keywords");
+
+// =========== controller for getting AI generated responses
 
 // Load the models ==================
+
 // Claude
+const KeyWordMap = require("./keywords");
 const Anthropic = require("@anthropic-ai/sdk");
 const client_anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -24,8 +27,6 @@ const google_model = client_google.getGenerativeModel({
 
 // gemma:2b local model for testing
 const local_url = "http://localhost:11434/api/generate";
-
-//==============
 
 async function autoselectmodel(message) {
   let lower_message = message.toLowerCase();
@@ -166,6 +167,83 @@ const handleChat = async (req, res) => {
   }
 };
 
+// ========== controller to allow user to get past chats Title when
+// landing on screen1
+const mongoose = require("mongoose");
+const Chat = require("./model");
+
+const getConversationTitle = async (req, res) => {
+  try {
+    const convo_title = await Chat.find({}, { title: 1 });
+    res.status(200).json(convo_title);
+    return;
+  } catch (error) {
+    res.status(500).json({
+      message: "Error querying the MongoDB databse",
+      error: error.message,
+    });
+  }
+};
+
+// =============== controller for getting an entire chat 
+const getConversationMessages = async (req, res) => {
+  try {
+    const conversation = await Chat.findById(req.params.id);
+    res.status(200).json(conversation);
+  } catch (error) {
+    res.status(500).json({
+      message : "Could not get the chat data",
+      error : error.message,
+    })
+  }
+}
+
+//============== Controller for creating a conversation
+const createConversation = async (req, res) => {
+  try {
+    const newConversation = new Chat(req.body);
+    await newConversation.save();
+
+    res.status(201).json({
+      message: "Conversation saved",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error while creating a chat",
+      error: error.message,
+    });
+  }
+};
+
+//================== Controller for updating chats inside a conversation
+const updateConversation = async (req, res) => {
+  try {
+    const conversation = await Chat.findById(req.params.id);
+    if (!conversation) {
+      res.status(404).json({
+        message: "Conversation not found",
+      });
+    }
+
+    conversation.messages.push(req.body);
+
+    await conversation.save();
+
+    res.status(200).json({
+      message: "Conversation was updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Could not update the connversation",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   handleChat,
+  getConversationTitle,
+  createConversation,
+  updateConversation,
+  getConversationMessages
 };

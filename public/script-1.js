@@ -2,8 +2,8 @@
 const inputbox = document.querySelector("#prompt-text");
 const sendbutton = document.querySelector(".send")
 
-function gotoscreen2(question) {
-  window.location.replace(`${window.location.origin}/screen2.html?query=${encodeURIComponent(question)}`);
+async function gotoscreen2({message, model}) {
+  window.location.href = `${window.location.origin}/screen2.html?model=${encodeURIComponent(model)}&query=${encodeURIComponent(message)}`
 }
 
 inputbox.addEventListener("keydown", (evt) => {
@@ -15,16 +15,24 @@ inputbox.addEventListener("keydown", (evt) => {
     return;
   }
   
-  gotoscreen2(content);
+  const model = document.querySelector(`input[name="model"]:checked`)
+  gotoscreen2({
+    model : model.id,
+    message : content,
+  });
 });
 
 sendbutton.addEventListener("click", () => {
   let content = inputbox.value;
+  const model = document.querySelector(`input[name="model"]:checked`)
   if (!content) {
     return;
   }
 
-  gotoscreen2(content)
+  gotoscreen2({
+    model : model.id,
+    message : content,
+  })
 
 })
 
@@ -53,4 +61,12 @@ window.addEventListener("resize", () => {
   }
 });
 
-//==========================================
+//============ New chat insertion in database =======
+
+const newchatbutton = document.querySelector("#newchat")
+
+newchatbutton.addEventListener("click", () => {
+  inputbox.value = "";
+  inputbox.focus();
+
+})

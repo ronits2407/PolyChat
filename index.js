@@ -21,7 +21,7 @@ const connectToDatabase = async () => {
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
+    }); 
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("MongoDB connection error:", error.message);
@@ -37,5 +37,6 @@ app.use("/api", chatRoutes);
 app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(PORT, () => {
-  console.log(`PolyChat API server is running on port ${PORT}`);
+  console.log(`\n\nPolyChat API server is running on port ${PORT}
+access it from here \x1b[32mhttp://localhost:${PORT}/\x1b[0m\n\n`);
 });

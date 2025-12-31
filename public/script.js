@@ -1,4 +1,11 @@
+//======= backend API calling functions==============
+const prompt = document.querySelector("#prompt-text");
+const modelSelect = document.querySelector("#model-select-drop-down");
+const response_div = document.querySelector(".response");
+const conversation = document.querySelector("#conversation");
+const send_button = document.querySelector(".send");
 const API_BASE_URL = "http://localhost:5000/api";
+const params = new URLSearchParams(window.location.search);
 
 async function handleChat(message, model, chatId = null) {
   try {
@@ -25,149 +32,137 @@ async function handleChat(message, model, chatId = null) {
     throw error;
   }
 }
+//===================
 
+//========= Responsive UI components
 
-const send_button = document.querySelector(".send")
-const prompt = document.querySelector("#prompt-text")
-const modelSelect = document.querySelector("#model-select-drop-down")
-const response_div = document.querySelector(".response")
-const conversation = document.querySelector("#conversation")
-
+//--------scrolling
 function scrollToBottom() {
   conversation.scrollTo({
     top: conversation.scrollHeight,
-    behavior: "smooth"
+    behavior: "smooth",
   });
 }
 
-
-
-let questionId = 2;
-
-send_button.addEventListener( "click" , async () => {
-  const query = prompt.value;
-  if (!query) {
-    return
-  }
-  const model = modelSelect.value;
-  const response_curr = response_div.cloneNode(true);
-  response_curr.style.display = "flex";
-
-  
-  response_curr.classList.remove("question-1");
-  response_curr.classList.add(`question-${questionId}`);
-  response_curr.querySelector(".question").textContent = query;
-  const answer_content = response_curr.querySelector(".answer");
-  answer_content.innerHTML = '';
-  conversation.appendChild(response_curr)
-  prompt.value = '';
-  scrollToBottom();
-
-  
-  const answer =  await handleChat(query, model);
-  
-  
-  
-  const answer_text = marked.parse(answer["message"])
-
-  answer_content.innerHTML = answer_text;
-  questionId++;
-
-
-  console.log(answer_text)
-  
-})
-
-prompt.addEventListener("keydown", async (evt) => {
-  const query = prompt.value;
-  if (evt.key == "Enter" && prompt.value) {
-  // const query = prompt.value;
-  if (!query) {
-    return
-  }
-  const model = modelSelect.value;
-  const response_curr = response_div.cloneNode(true);
-  response_curr.style.display = "flex";
-
-  
-  response_curr.classList.remove("question-1");
-  response_curr.classList.add(`question-${questionId}`);
-  response_curr.querySelector(".question").textContent = query;
-  const answer_content = response_curr.querySelector(".answer");
-  answer_content.innerHTML = '';
-  conversation.appendChild(response_curr)
-  prompt.value = '';
-  scrollToBottom();
-
-  
-  const answer =  await handleChat(query, model);
-  
-  
-  
-  const answer_text = marked.parse(answer["message"])
-
-  answer_content.innerHTML = answer_text;
-  questionId++;
-
-
-  console.log(answer_text)
-  }
-})
-
-
-
-
-// for screen 2
-
-
-const chatarea1 = document.querySelector("#chatarea-2")
-const inputbox = chatarea1.querySelector("#prompt-text")
-
-inputbox.addEventListener("keydown",async (evt) => {
-  if (evt.key != "Enter") {
-    return
-  }
-  let content = inputbox.textContent;
-  if (!content) {
-    return
-  }
-
-  
-  
-})
-
-
-
-
-
-const panel = document.querySelector("#panel")
+//------------sidepane toggle
+const panel = document.querySelector("#panel");
 const sidepanetoggle = document.querySelector("#chat-history-button");
 
 sidepanetoggle.addEventListener("click", () => {
-  console.log("Toggle button was clicked")
   if (panel.style.display == "flex") {
-    panel.style.display = "none"
+    panel.style.display = "none";
+  } else {
+    panel.style.display = "flex";
   }
-  else{
-    panel.style.display = "flex"
-  }
-})
-
-
+});
 
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
-     panel.style.display = "none"
+    panel.style.display = "none";
+  } else {
+    panel.style.display = "flex";
   }
-  else{
-    panel.style.display = "flex"
-  }
-})
+});
+//=====================
 
+//============== chat handlers
+let questionId = 2;
+
+async function getanswer(promptInfo) {
+  const model = promptInfo.model;
+  const message = promptInfo.message;
+  const question_ID = promptInfo.ID;
+
+  if (!message || !model || !question_ID) {
+    throw new Error("Parameters of the promptInfo are empty");
+  }
+
+  prompt.innerHTML = "";
+  let response_curr = response_div.cloneNode(true);
+  response_curr.style.display = "flex";
+  response_curr.classList.remove("question-1");
+  response_curr.classList.add(`question-${question_ID}`);
+  response_curr.querySelector(".question").textContent = message;
+  const answer_content = response_curr.querySelector(".answer");
+  answer_content.innerHTML = "";
+
+  let temp = response_curr.cloneNode(true);
+  response_curr.querySelector(".response-info").remove();
+  response_curr.querySelector(".related-questions").remove();
+
+  conversation.appendChild(response_curr);
+  scrollToBottom();
+  try {
+    let data = await handleChat(message, model);
+    response_curr = document.querySelector(`.question-${question_ID}`);
+    temp.querySelector(
+      ".model-name"
+    ).textContent = `Answer generated by ${model}`;
+    temp.querySelector(".answer").innerHTML = marked.parse(data.message);
+
+    response_curr.appendChild(temp.querySelector(".response-info"));
+    scrollToBottom();
+    // handle the realated questions thing
+    // response_curr.appendChild(temp.childNodes[2]);
+    return;
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+}
+
+// load the first chat when the page loads
+if (params.get("model") && params.get("query")) {
+  console.log(params.get("model"))
+  getanswer({
+    model: params.get("model"),
+    message: params.get("query"),
+    ID: questionId,
+  });
+  console.log(modelSelect.value)
+  modelSelect.value = params.get("model");
+  console.log(modelSelect.value)
+  window.history.replaceState({}, "", window.location.pathname);
+  questionId++;
+}
+
+send_button.addEventListener("click", async () => {
+  const query = prompt.value;
+  const model = modelSelect.value;
+
+  getanswer({
+    model,
+    message: query,
+    ID: questionId,
+  });
+
+  questionId++;
+});
+
+prompt.addEventListener("keydown", async (evt) => {
+  const query = prompt.value;
+  const model = modelSelect.value;
+
+  if (evt.key != "Enter") {
+    return;
+  }
+
+  getanswer({
+    model,
+    message: query,
+    ID: questionId,
+  });
+
+  questionId++;
+});
+
+// for screen 2
 
 //=====================copy to clipboard logic
 async function copyToClip(id) {
-  const copid = document.querySelector(`.question-${id}`).querySelector(".answer");
+  const copid = document
+    .querySelector(`.question-${id}`)
+    .querySelector(".answer");
   try {
     await navigator.clipboard.writeText(copid.textContent);
   } catch (error) {
@@ -175,17 +170,36 @@ async function copyToClip(id) {
   }
 }
 
-const copyButtons = document.querySelectorAll(".copy")
-console.log(copyButtons)
+const copyButtons = document.querySelectorAll(".copy");
 
 copyButtons.forEach((button) => {
-  button.addEventListener("click",async (info) => {
+  button.addEventListener("click", async (info) => {
     let grandparent = info.target.parentElement.parentElement;
     let grand_grandparent = grandparent.parentElement.parentElement;
     let question = grand_grandparent.parentElement;
-    
+
     let id = Number(question.classList[1].substring(9));
-    console.log(id)
     await copyToClip(id);
-  })
+  });
+});
+
+
+//=============== New Chat button
+const newchatbutton = document.querySelector("#newchat")
+const recentChatList = document.querySelector(".recentChatList")
+const templateChat = document.querySelector(".recentChat")
+
+newchatbutton.addEventListener("click", () => {
+  let newchat = templateChat.cloneNode(true);
+  newchat.style.display = "flex";
+  let firstquestion = document.querySelectorAll(".response");
+  if (firstquestion.length == 1) {
+    window.location.href = `${window.location.origin}/`
+    return
+  }
+
+  newchat.querySelector("a").textContent = firstquestion[1].querySelector(".question").textContent
+  recentChatList.prepend(newchat)
+  // window.location.href = `${window.location.origin}/`
+
 })
