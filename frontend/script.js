@@ -51,13 +51,16 @@ send_button.addEventListener( "click" , async () => {
   }
   const model = modelSelect.value;
   const response_curr = response_div.cloneNode(true);
+  response_curr.style.display = "flex";
 
   
   response_curr.classList.remove("question-1");
   response_curr.classList.add(`question-${questionId}`);
   response_curr.querySelector(".question").textContent = query;
-  answer_content = response_curr.querySelector(".answer");
+  const answer_content = response_curr.querySelector(".answer");
+  answer_content.innerHTML = '';
   conversation.appendChild(response_curr)
+  prompt.value = '';
   scrollToBottom();
 
   
@@ -72,6 +75,7 @@ send_button.addEventListener( "click" , async () => {
 
 
   console.log(answer_text)
+  
 })
 
 prompt.addEventListener("keydown", async (evt) => {
@@ -115,3 +119,20 @@ prompt.addEventListener("keydown", async (evt) => {
 
 
 // for screen 1
+
+
+const chatarea1 = document.querySelector("#chatarea-1")
+const inputbox = chatarea1.querySelector("prompt-text")
+
+inputbox.addEventListener("keydown",async (evt) => {
+  if (evt.key != "Enter") {
+    return
+  }
+  let content = inputbox.textContent;
+  if (!textContent) {
+    return
+  }
+
+  
+  
+})
