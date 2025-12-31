@@ -129,9 +129,9 @@ div.recentChat{
 div.recentChat a{
     all: unset;
     border-radius: 0.75rem;
-    font-size: .875rem;
-    font-weight: 200;
-    height: 40px;
+    font-size: .9rem;
+    font-weight: 700;
+    height: 50px;
     display: flex;
     align-items: center;
     

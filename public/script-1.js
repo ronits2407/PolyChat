@@ -70,3 +70,44 @@ newchatbutton.addEventListener("click", () => {
   inputbox.focus();
 
 })
+
+
+// =============== Load the titles of all chats ==
+
+const API_BASE_URL = "http://localhost:5000/api";
+const chatTitleTemplate = document.querySelector(".recentChat")
+const ChatListDiv = document.querySelector(".recentChatList")
+
+async function getTitles() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/conversations`, {
+      method: "GET"
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get chat titles: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    for (const conversation of data) {
+
+      let temp = chatTitleTemplate.cloneNode(true);
+
+      temp.style.display = "flex"
+      let link = temp.querySelector("a")
+      link.id = conversation._id
+      link.href = `${window.location.origin}/screen2.html?chatid=${encodeURIComponent(conversation._id)}`
+      link.textContent = conversation.title
+
+      ChatListDiv.prepend(temp);
+
+    }
+
+  } catch (error) {
+    console.error("Error calling handleChat API:", error);
+    throw error;
+  }
+}
+
+getTitles();
+
