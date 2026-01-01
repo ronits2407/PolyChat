@@ -123,7 +123,7 @@ newchatbutton.addEventListener("click", () => {
   catch (error) {
     // alert the user if we can't get the chat data
     alert("Could not Fetch Recent-Chats from the Server.");
-    console.log(error);
+    console.error(error);
   }
 })();
 

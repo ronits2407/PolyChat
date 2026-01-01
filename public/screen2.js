@@ -1,22 +1,59 @@
+//-----------------Load repeatadly used compenents , API and page info
+
 const API_BASE_URL = "http://localhost:5000/api";
 const newchatbutton = document.querySelector("#newchat");
 const recentChatList = document.querySelector(".recentChatList");
-const templateChat = document.querySelector(".recentChat");
-// =============== Load the titles of all chats ==
 const chatTitleTemplate = document.querySelector(".recentChat");
-const ChatListDiv = document.querySelector(".recentChatList");
+const prompt = document.querySelector("#prompt-text");
+const modelSelect = document.querySelector("#model-select-drop-down");
+const response_div = document.querySelector(".response");
+const conversation = document.querySelector("#conversation");
+const send_button = document.querySelector(".send");
+const params = new URLSearchParams(window.location.search);
+
+//------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//--------- Define a function for Loading the titles of all chats 
 
 async function getTitles() {
+
   try {
+
+    // Get chatTitles Data from API
     const response = await fetch(`${API_BASE_URL}/conversations`, {
       method: "GET",
     });
 
+    // Check if backend was able to give data correctly
     if (!response.ok) {
-      throw new Error(`Failed to get chat titles: ${response.status}`);
+      throw new Error(`Failed to get chat titles: ${response.status}\n`);
     }
+
+    // Convert the data received in json
     const data = await response.json();
 
+    // Load Chat for each conversation in Database
     for (const conversation of data) {
       let temp = chatTitleTemplate.cloneNode(true);
 
@@ -25,23 +62,18 @@ async function getTitles() {
       link.href = `${window.location.origin}/screen2.html?chatid=${encodeURIComponent(conversation._id)}`;
       link.textContent = conversation.title;
 
-      ChatListDiv.prepend(temp);
+      recentChatList.prepend(temp);
     }
-  } catch (error) {
-    console.error("Error calling handleChat API:", error);
-    throw error;
+  } 
+  catch (error) {
+    console.error(error);
   }
 }
 
 //======= backend API calling functions==============
-const prompt = document.querySelector("#prompt-text");
-const modelSelect = document.querySelector("#model-select-drop-down");
-const response_div = document.querySelector(".response");
-const conversation = document.querySelector("#conversation");
-const send_button = document.querySelector(".send");
+
 let currId;
 
-const params = new URLSearchParams(window.location.search);
 
 async function handleChat(message, model, chatId = null) {
   try {
