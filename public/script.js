@@ -64,7 +64,7 @@ async function handleChat(message, model, chatId = null) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error calling handleChat API:", error);
+    console.error("Error calling handleChat API:\n", error);
     throw error;
   }
 }
@@ -210,12 +210,14 @@ function displayChat(_conversation) {
 
 // load the first chat when the page loads
 if (params.get("model") && params.get("query")) {
+
+  modelSelect.value = params.get("model");
+  console.log(modelSelect.value)
   getanswer({
     model: params.get("model"),
     message: params.get("query"),
     ID: questionId,
   });
-  modelSelect.value = params.get("model");
   window.history.replaceState({}, "", window.location.pathname);
   questionId++;
 } else if (params.get("chatid")) {
@@ -257,6 +259,7 @@ send_button.addEventListener("click", async () => {
 prompt.addEventListener("keydown", async (evt) => {
   const query = prompt.value;
   const model = modelSelect.value;
+  console.log(model)
 
   if (evt.key != "Enter") {
     return;

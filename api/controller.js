@@ -19,11 +19,8 @@ const client_openai = new OpenAI({
 });
 
 // Gemini-3.5-pro
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const client_google = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const google_model = client_google.getGenerativeModel({
-  model: "gemini-3.5-pro",
-});
+const { GoogleGenAI  } = require("@google/genai");
+const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // gemma:2b local model for testing
 const local_url = "http://localhost:11434/api/generate";
@@ -54,20 +51,58 @@ const handleChat = async (req, res) => {
       return;
     }
 
+    let conversation_already
+
     if (!chatId) {
       try {
-        const newConversation = new Chat(req.body);
-        newConversation.title = message;
+        const newConversation = new Chat({
+          title : message,
+          messages : [{
+            role : "user",
+            content : message,
+            model,
+          }]
+        });
+
         await newConversation.save();
 
         chatId = newConversation._id;
+        conversation_already = newConversation;
       } catch (error) {
         res.status(500).json({
           message: "Error while creating a chat",
           error: error.message,
         });
+        return;
+      }
+    } else {
+      try {
+        conversation_already = await Chat.findById(chatId, {
+          messages: { $slice: -10 },
+        });
+
+        if (!conversation_already) {
+          res.status(500).json({
+            message: "Error while retrieving the previous chats",
+          });
+          return;
+        }
+        conversation_already.messages.push({
+          role: "user",
+          content: message,
+        });
+
+        await conversation_already.save();
+      } catch (error) {
+        res.status(500).json({
+          message: "Error while retrieving the chat , no chat found",
+          error: error.message,
+        });
+        return;
       }
     }
+
+    // console.log(conversation_already)
 
     if (model == "auto") {
       model = await autoselectmodel(message);
@@ -83,14 +118,17 @@ const handleChat = async (req, res) => {
     }
 
     if (model == "claude-2.5") {
+      let messagesList = []
+      for (const message of conversation_already.messages) {
+        messagesList.push({
+          role : message.role,
+          content : message.content,
+        })
+      }
       const response = await client_anthropic.messages.create({
-        model: "claude-2.5",
-        messages: [
-          {
-            role: "user",
-            content: message,
-          },
-        ],
+        model: "claude-sonnet-4-5",
+        max_tokens : 1000,
+        messages: messagesList
       });
 
       if (!response || !response.content) {
@@ -106,26 +144,48 @@ const handleChat = async (req, res) => {
         }
       }
     } else if (model == "gpt-4o") {
-      const response = await client_openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "user",
-            content: message,
-          },
-        ],
-      });
-
-      if (!response || !response.choices || !response.choices[0].message) {
-        res.status(400).json({
-          error: "The OpenAI model did not give any textual response",
+      try {
+        let messageList = []
+        for (const message of conversation_already.messages) {
+          messageList.push({
+            role : message.role,
+            content : message.content
+          })
+        }
+        const response = await client_openai.responses.create({
+          model: "gpt-4.1-mini",
+          input: messageList,
         });
-        return;
-      }
 
-      response_string = response.choices[0].message.content;
+        // console.log(response);
+
+        if (!response || !response.output_text) {
+          res.status(400).json({
+            error: "The OpenAI model did not give any textual response",
+          });
+          return;
+        }
+
+        response_string = response.output_text;
+      } catch (error) {
+        console.log(error)
+      }
     } else if (model == "gemini-3.5-pro") {
-      const response = await google_model.generateContent(message);
+      let messageList = []
+      for (const message of conversation_already.messages) {
+        messageList.push({
+            role : ((message.role == "user") ? "user":"model"),
+            parts : [
+              {
+                text : message.content
+              }
+            ]
+          })
+      }
+      const response = await client_google.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents : messageList
+      });
 
       if (!response) {
         res.status(400).json({
@@ -134,7 +194,7 @@ const handleChat = async (req, res) => {
         return;
       }
 
-      response_string = response.response.text();
+      response_string = response.text;
     }
     // i am using a local model gemma:2b for testing purposes as API free trial
     // ran out
@@ -161,41 +221,31 @@ const handleChat = async (req, res) => {
       }
       try {
         const answer = await response.json();
-        console.log(answer);
+        // console.log(answer);
         response_string = answer["response"];
       } catch (error) {
         res.status(400).json({
           error: "Ollama failed",
         });
+        return;
       }
     }
 
     try {
-    const conversation = await Chat.findById(chatId);
-    if (!conversation) {
-      res.status(404).json({
-        message: "Conversation not found",
+      conversation_already.messages.push({
+        role: "assistant",
+        content: response_string,
+        model,
       });
+
+      await conversation_already.save();
+    } catch (error) {
+      res.status(500).json({
+        message: "Could not create the conversation",
+        error: error.message,
+      });
+      return;
     }
-
-    conversation.messages.push({
-      role : "user",
-      content : message,
-      model
-    });
-    conversation.messages.push({
-      role : "assistant",
-      content : response_string,
-      model
-    });
-
-    await conversation.save();
-  } catch (error) {
-    res.status(500).json({
-      message: "Could not create the conversation",
-      error: error.message,
-    });
-  }
 
     res.status(200).json({
       chatId,
@@ -208,6 +258,7 @@ const handleChat = async (req, res) => {
       .status(500)
       .json({ message: "Error handling chat", error: error.message });
   }
+  return;
 };
 
 // ========== controller to allow user to get past chats Title when
@@ -225,6 +276,7 @@ const getConversationTitle = async (req, res) => {
       message: "Error querying the MongoDB databse",
       error: error.message,
     });
+    return;
   }
 };
 
@@ -232,13 +284,15 @@ const getConversationTitle = async (req, res) => {
 const getConversationMessages = async (req, res) => {
   try {
     const conversation = await Chat.findById(req.params.id);
-    console.log("Success")
+    // console.log("Success");
     res.status(200).json(conversation);
+    return;
   } catch (error) {
     res.status(500).json({
       message: "Could not get the chat data",
       error: error.message,
     });
+    return;
   }
 };
 
@@ -251,11 +305,13 @@ const createConversation = async (req, res) => {
     res.status(201).json({
       message: "Conversation saved",
     });
+    return;
   } catch (error) {
     res.status(500).json({
       message: "Error while creating a chat",
       error: error.message,
     });
+    return;
   }
 };
 
@@ -267,6 +323,7 @@ const updateConversation = async (req, res) => {
       res.status(404).json({
         message: "Conversation not found",
       });
+      return;
     }
 
     conversation.messages.push(req.body);
@@ -276,11 +333,13 @@ const updateConversation = async (req, res) => {
     res.status(200).json({
       message: "Conversation was updated",
     });
+    return;
   } catch (error) {
     res.status(500).json({
       message: "Could not update the connversation",
       error: error.message,
     });
+    return;
   }
 };
 
