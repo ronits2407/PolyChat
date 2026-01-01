@@ -43,7 +43,7 @@ async function autoselectmodel(message) {
 }
 
 const handleChat = async (req, res) => {
-  let { message, model } = req.body;
+  let { message, model, chatId } = req.body;
   let response_string = "";
 
   try {
@@ -52,6 +52,21 @@ const handleChat = async (req, res) => {
         error: "Message or model name not provided",
       });
       return;
+    }
+
+    if (!chatId) {
+      try {
+        const newConversation = new Chat(req.body);
+        newConversation.title = message;
+        await newConversation.save();
+
+        chatId = newConversation._id;
+      } catch (error) {
+        res.status(500).json({
+          message: "Error while creating a chat",
+          error: error.message,
+        });
+      }
     }
 
     if (model == "auto") {
@@ -155,7 +170,35 @@ const handleChat = async (req, res) => {
       }
     }
 
+    try {
+    const conversation = await Chat.findById(chatId);
+    if (!conversation) {
+      res.status(404).json({
+        message: "Conversation not found",
+      });
+    }
+
+    conversation.messages.push({
+      role : "user",
+      content : message,
+      model
+    });
+    conversation.messages.push({
+      role : "assistant",
+      content : response_string,
+      model
+    });
+
+    await conversation.save();
+  } catch (error) {
+    res.status(500).json({
+      message: "Could not create the conversation",
+      error: error.message,
+    });
+  }
+
     res.status(200).json({
+      chatId,
       model,
       message: response_string,
     });
@@ -185,18 +228,19 @@ const getConversationTitle = async (req, res) => {
   }
 };
 
-// =============== controller for getting an entire chat 
+// =============== controller for getting an entire chat
 const getConversationMessages = async (req, res) => {
   try {
     const conversation = await Chat.findById(req.params.id);
+    console.log("Success")
     res.status(200).json(conversation);
   } catch (error) {
     res.status(500).json({
-      message : "Could not get the chat data",
-      error : error.message,
-    })
+      message: "Could not get the chat data",
+      error: error.message,
+    });
   }
-}
+};
 
 //============== Controller for creating a conversation
 const createConversation = async (req, res) => {
@@ -245,5 +289,5 @@ module.exports = {
   getConversationTitle,
   createConversation,
   updateConversation,
-  getConversationMessages
+  getConversationMessages,
 };

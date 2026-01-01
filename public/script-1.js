@@ -96,7 +96,7 @@ async function getTitles() {
       temp.style.display = "flex"
       let link = temp.querySelector("a")
       link.id = conversation._id
-      link.href = `${window.location.origin}/screen2.html?chatid=${encodeURIComponent(conversation._id)}`
+      link.href = `${window.location.origin}/screen2.html?chatid=${encodeURIComponent(conversation._id)}&recent=true`
       link.textContent = conversation.title
 
       ChatListDiv.prepend(temp);
