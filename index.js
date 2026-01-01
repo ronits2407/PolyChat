@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path")
+const open = require("open")
 dotenv.config();
 
 const express = require("express");
@@ -39,4 +40,5 @@ app.use(express.static(path.join(__dirname, "public")));
 app.listen(PORT, () => {
   console.log(`\n\nPolyChat API server is running on port ${PORT}
 access it from here \x1b[32mhttp://localhost:${PORT}/\x1b[0m\n\n`);
+open(`http://localhost:${PORT}/`)
 });
