@@ -182,9 +182,7 @@ const handleChat = async (req, res) => {
       try {
 
         // get the previous conversations from database and store it in conversation_already
-        conversation_already = await Chat.findById(chatId, {
-          summary : 1
-        });
+        conversation_already = await Chat.findById(chatId);
 
         if (!conversation_already) {
           res.status(500).json({
@@ -232,19 +230,14 @@ const handleChat = async (req, res) => {
       let prompt = {
         role : "system",
         content : `
-        You are tasked with generating two outputs based on the provided information.
-        You must always respond by calling the tool "response_template"
+           Input
+          previous chats summary ${conversation_already.summary || "no summary"}
 
-          ### Inputs
-          - **Last Chats Summary:** ${conversation_already.summary || "no summary"}
+          task
+          1 Update the summary :- combine existing summary with  current question and your generated answer
+            out put a new summar that contains the updated info
 
-          ### Task
-          1. **Update the Summary**  
-            - Combine the existing summary with the current question and your generated answer
-            - Produce a new summary string that reflects the updated context
-
-          2. **User Response**  
-            - Provide the direct answer (your generated response) to the current question sent by user
+          2 user response:- give answer (response for the current question) to the current question sent by user
 
           ### Output Format
           Return a single JSON object as in the tool with the following structure:
@@ -253,10 +246,6 @@ const handleChat = async (req, res) => {
             "userResponse": "<string_of_user_response>",
             "newSummary": "<string_of_new_summary>"
           }
-
-          - "userResponse" → The answer you generate for the current question  
-          - "newSummary" → The updated summary that merges the current summary, the question, and your answer
-
         `
         }
         
@@ -284,7 +273,18 @@ const handleChat = async (req, res) => {
           }]
         });
         
-        const toolBlock = response.content.find( block => block.type == "tool_use");
+        let toolBlock
+        for (let block of response.content) 
+          {
+
+          if (block.type === "tool_use") 
+            {
+            toolBlock = block
+            break
+          }
+
+        }
+
         
         
         if (!toolBlock || toolBlock.name != "response_template") {
@@ -308,7 +308,6 @@ const handleChat = async (req, res) => {
         {
           role: "system",
           content: `
-            you  are a  helpful assistant
             past chats summary: ${conversation_already.summary || "none"}
             
             task:
@@ -353,53 +352,75 @@ const handleChat = async (req, res) => {
         console.log(error)
     }
     } else if (model == "gemini") {
-     
-      const response = await client_google.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents : [{
-          role : "user",
-          parts : [{
-            text : `
-            Previous summary  ${conversation_already.summary || "none"}
-                
+      try {
+        
+        
+        const response = await client_google.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents : [{
+            role : "user",
+            parts : [{
+              text : `
+              Previous summary  ${conversation_already.summary || "none"}
+              
+              
+              Task: Return a JSON object with
+               "userResponse"  => Provide a direect response to the user.
+              "newSummary"  => Update summary of the conversation.
 
-                Current user question: ${message}
-
-                Task:
-                1 Provide a direect response to the user.
-                2 Update summary of the conversation.
-            `
-          }]
-        }],
-        generationConfig : {
-          responseMimeType: "application/json",
-          responseSchema: {
-
-            type: "object",
-
-            properties: 
-            {
-                userResponse: { type: "string" },
-
-                newSummary: { type: "string" }
+              format : 
+              {
+               "userResponse" : <User response>
+               "newSummary" : <new summary>
+              }
+              `
             },
-
-            required: [ "userResponse" , "newSummary"]
+          ]
           },
-        }
-      });
+              {
+            role : "user",
+            parts : [{
+              text : message
+            }]
 
-      if (!response) {
-        res.status(400).json({
-          error: "The Google model did not give any textual response",
+          }],
+          generationConfig : {
+            responseMimeType: "application/json",
+            responseSchema: {
+              
+              type: "object",
+              
+              properties: 
+              {
+                userResponse: { type: "string" },
+                
+                newSummary: { type: "string" }
+              },
+              
+              required: [ "userResponse" , "newSummary"]
+            },
+          }
         });
-        return;
+        
+        if (!response) {
+          res.status(400).json({
+            error: "The Google model did not give any textual response",
+          });
+          return;
+        }
+        console.log(response)
+        console.log(response.candidates[0])
+        // console.log(response.candidates[0].content)
+        // const result_parsed = JSON.parse(response.candidates[0].content.parts[0].text)
+        const result_parsed = JSON.parse(response.text)
+        
+        response_string = result_parsed.userResponse;
+        conversation_already.summary = result_parsed.newSummary;
+      } catch (error) {
+        res.status(500).json({
+          err : error.message
+        })
       }
-
-      const result_parsed = JSON.parse(response.response.text())
-
-      response_string = result_parsed.userResponse;
-      conversation_already.summary = result_parsed.newSummary;
     }
 
     // i am using a local model gemma:2b for testing purposes as API free trial
@@ -414,14 +435,13 @@ const handleChat = async (req, res) => {
         {
           role: "system",
           content: `
-            You are a helpful assistant.
             past content summary: ${conversation_already.summary || "none"}
             
-            TASK: 
-            1. Answer the user's current question.
-            2. Update the summary to include this interaction.
+            task => 
+            1 give response to current user question
+            2 update the sumamary to include this interaefction.
             
-            RESPOND ONLY IN JSON.
+            respond in JSON strictly
           `
         },
         { role: "user", content: message }
