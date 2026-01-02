@@ -89,7 +89,7 @@ newchatbutton.addEventListener("click", () => {
 //------------------  Load the titles of all previous chats in sidepane using an IIFE
 
 
-(async function () {
+async function getTitless() {
 
   try {
     // Get the chat title data from backend API
@@ -125,8 +125,8 @@ newchatbutton.addEventListener("click", () => {
     alert("Could not Fetch Recent-Chats from the Server.");
     console.error(error);
   }
-})();
-
+}
+getTitless()
 //-----------------------------------------------------------------
 
 
@@ -188,9 +188,3 @@ sendbutton.addEventListener("click", () => {
 })
 
 //----------------------------------------------------------------------
-
-
-
-
-
-
