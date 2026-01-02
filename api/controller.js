@@ -240,11 +240,11 @@ const handleChat = async (req, res) => {
 
           ### Task
           1. **Update the Summary**  
-            - Combine the existing summary with the current question and your generated answer.  
-            - Produce a new summary string that reflects the updated context.
+            - Combine the existing summary with the current question and your generated answer
+            - Produce a new summary string that reflects the updated context
 
           2. **User Response**  
-            - Provide the direct answer (your generated response) to the current question sent by user.
+            - Provide the direct answer (your generated response) to the current question sent by user
 
           ### Output Format
           Return a single JSON object as in the tool with the following structure:
@@ -254,8 +254,8 @@ const handleChat = async (req, res) => {
             "newSummary": "<string_of_new_summary>"
           }
 
-          - "userResponse" → The answer you generate for the current question.  
-          - "newSummary" → The updated summary that merges the current summary, the question, and your answer.
+          - "userResponse" → The answer you generate for the current question  
+          - "newSummary" → The updated summary that merges the current summary, the question, and your answer
 
         `
         }
@@ -301,31 +301,57 @@ const handleChat = async (req, res) => {
       
     } else if (model == "chatgpt") {
       try {
-        let messageList = []
-        for (const message of conversation_already.messages) {
-          messageList.push({
-            role : message.role,
-            content : message.content
-          })
+
+    const response = await client_openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `
+            you  are a  helpful assistant
+            past chats summary: ${conversation_already.summary || "none"}
+            
+            task:
+            1 Answer the user's question
+            2 Update the summary to include this new interaction
+          `
+        },
+        { role: "user", content: message }
+      ],
+      response_format: {
+
+        type: "json_schema",
+
+        json_schema: {
+          name: "contextual_memory_template",
+          strict: true,
+          schema: {
+
+            type: "object",
+
+            properties: 
+            {
+              userResponse: { type: "string" },
+              newSummary: { type: "string" }
+            },
+
+            required: ["userResponse", "newSummary"],
+            // this is rquird for strict rule foolowing
+            additionalProperties: false
+          }
         }
-        const response = await client_openai.responses.create({
-          model: "gpt-4.1-mini",
-          input: messageList,
-        });
-
-        // console.log(response);
-
-        if (!response || !response.output_text) {
-          res.status(400).json({
-            error: "The OpenAI model did not give any textual response",
-          });
-          return;
-        }
-
-        response_string = response.output_text;
-      } catch (error) {
-        console.log(error)
       }
+    });
+
+    const answer = JSON.parse(response.choices[0].message.content);
+
+    response_string = answer.userResponse;
+    conversation_already.summary = answer.newSummary;
+
+    }
+    catch (error) {
+        console.log(error)
+    }
     } else if (model == "gemini") {
      
       const response = await client_google.models.generateContent({
