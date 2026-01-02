@@ -378,74 +378,57 @@ const handleChat = async (req, res) => {
       response_string = result_parsed.userResponse;
       conversation_already.summary = result_parsed.newSummary;
     }
-    
+
     // i am using a local model gemma:2b for testing purposes as API free trial
     // ran out
-    else if (model == "gemma") {
+    else if (model == "gemma" || model=="mistral") {
       try {
-      let messagesList = [{
-        role : "system",
-        content : "Always say Hello Ronit in start of your responses"
-      }]
-        for (const message of conversation_already.messages) {
-          messagesList.push({
-            role : message.role,
-            content : message.content
-          })
-        }
 
-        const response = await ollama.chat({
-          model : "gemma:2b",
-          messages : messagesList,
-          stream : false
-      })
+    const response = await ollama.chat({
 
-      response_string = response.message.content;
+      model: ((model == "gemma") ? "gemma:2b":"mistral:7b"),
+      messages: [
+        {
+          role: "system",
+          content: `
+            You are a helpful assistant.
+            past content summary: ${conversation_already.summary || "none"}
+            Last chat content: ${JSON.stringify(conversation_already.messages.slice(-2)) || "none"}
+            
+            TASK: 
+            1. Answer the user's current question.
+            2. Update the summary to include this interaction.
+            
+            RESPOND ONLY IN JSON.
+          `
+        },
+        { role: "user", content: message }
+      ],
+      stream: false,
+      format: {
+        type: "object",
+
+        properties: 
+        
+      {
+         userResponse: { type: "string" },
+         newSummary: { type: "string" }
+      },
+
+      required: ["userResponse", "newSummary"]
+    },
+      options: { temperature: 0 }// it was in ollama documentatoin
+    });
+
+    const answer = JSON.parse(response.message.content);
+
+    response_string = answer.userResponse;
+    conversation_already.summary = answer.newSummary;
       
        
       } catch (error) {
         res.status(400).json({
           err : error.message
-        });
-        return;
-      }
-    }
-    else if (model == "mistral") {
-      try {
-        let messageList = []
-        for (const message of conversation_already.messages) {
-          messageList.push({
-            role : message.role,
-            content : message.content
-          })
-        }
-
-      const query = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model : "mistral:7b",
-          messages : messageList,
-          stream: false,
-        }),
-      };
-
-      const response = await fetch(local_url, query);
-
-      if (!response.ok) {
-        const error_details = await response.json();
-        res.status(400).json({
-          error: "An error occured while retrieving the response",
-          error_details,
-        });
-        return;
-      }
-        const answer = await response.json();
-        // console.log(answer);
-        response_string = answer["message"]["content"];
-      } catch (error) {
-        res.status(400).json({
-          error: "Ollama Mistral failed",
         });
         return;
       }
@@ -481,6 +464,32 @@ const handleChat = async (req, res) => {
   }
   return;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ========== controller to allow user to get past chats Title when
 // landing on screen1
