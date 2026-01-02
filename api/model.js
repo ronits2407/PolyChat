@@ -27,6 +27,10 @@ const chatSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  summary : {
+    type : String,
+    default: null,
+  },
   messages: {
     type: [messageSchema],
     default: [],

@@ -1,42 +1,118 @@
+//-------------necessary imports
 const dotenv = require("dotenv");
 dotenv.config();
+const Anthropic = require("@anthropic-ai/sdk");
+const OpenAI = require("openai");
+const { GoogleGenAI  } = require("@google/genai");
+const ollama = require("ollama").default
+const mongoose = require("mongoose");
+const Chat = require("./model");
+const {keywordMap, keywords} = require("./keywords");
 
-// =========== controller for getting AI generated responses
 
-// Load the models ==================
+//---------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------------------Load the models ==================
 
 // Claude
-const KeyWordMap = require("./keywords");
-const Anthropic = require("@anthropic-ai/sdk");
 const client_anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 // GPT-4o
-const OpenAI = require("openai");
 const client_openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Gemini-3.5-pro
-const { GoogleGenAI  } = require("@google/genai");
 const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// gemma:2b local model for testing
-const local_url = "http://localhost:11434/api/chat";
 
-async function autoselectmodel(message) {
-  let lower_message = message.toLowerCase();
+// Gemma and Mistral do not need manual loading
 
-  for (const key in KeyWordMap) {
-    for (const element of KeyWordMap[key]) {
-      if (lower_message.includes(element)) {
-        return key;
-      }
-    }
+
+
+
+
+
+
+
+
+
+
+
+//------------------- Function to decide the Model to respond based on user message in AUTO mode
+
+async function autoselectmodel(message, summary = null, lastchat = null) {
+  // SET the model which is going to predict the model for this particular message
+  let methods = ["gemma", "chatgpt", "gemini", "claude", "mistral", "manual"];
+
+  const method = process.env.DEFAULT_MODEL_SELECTION_METHOD;
+
+  // Check if we have a valid method
+  if (!methods.includes(method)) {
+    throw new Error("The developer did not choose a valid method");
   }
 
-  return process.env.DEFAULT_MODEL || "gemma";
+  // If the method was using gemma for predicting the model
+  if (method == "gemma") {
+    try {
+      let predicted_model = await ollama.chat({
+        model: "gemma",
+        messages: [
+          {
+            role: "system",
+            content: `
+            Based on the given summary and the last chat analyse the user intent of the conversation and classify the message into one of 5 model categories as per the user requirement. Following is the raw classification keywords : ${keywordMap} Following is the user messages summary : ${summary} Following is the most recent conversation of user : ${lastchat}
+
+            NOTE => OUTPUT A SINGLE key value pair object named with the key "predictedModel" i.e the name of one of the model from Keyword object 
+            `,
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+        format: {
+          type: "object",
+          predictedModel: {
+            type: "string",
+          },
+          required: ["predictedModel"],
+        },
+      });
+
+      return predicted_model;
+    } catch (error) {
+      console.error(error);
+      // method = "manual"
+    }
+  } else if (method == "manual") {
+    // convert the current message to lowercase
+    let lower_message = message.toLowerCase();
+
+    // check for values in model kwywords manually
+    for (const key in keywords) {
+      for (const element of keywords[key]) {
+        if (lower_message.includes(element)) {
+          return key;
+        }
+      }
+    }
+
+    return process.env.DEFAULT_MODEL || "gemma";
+  }
 }
 
 const handleChat = async (req, res) => {
@@ -44,6 +120,7 @@ const handleChat = async (req, res) => {
   let response_string = "";
 
   try {
+    // Check if we got a valid model
     if (!message || !model) {
       res.status(400).json({
         error: "Message or model name not provided",
@@ -51,10 +128,12 @@ const handleChat = async (req, res) => {
       return;
     }
 
+     // create a variable for storing the current conversation previous chats
     let conversation_already
 
     if (!chatId) {
       try {
+        // if this is a new chat first create it in databse and assign conversation_already the value of chat
         const newConversation = new Chat({
           title : message,
           messages : [{
@@ -68,6 +147,7 @@ const handleChat = async (req, res) => {
 
         chatId = newConversation._id;
         conversation_already = newConversation;
+
       } catch (error) {
         res.status(500).json({
           message: "Error while creating a chat",
@@ -77,16 +157,20 @@ const handleChat = async (req, res) => {
       }
     } else {
       try {
+
+        // get the previous conversations from database and store it in conversation_already
         conversation_already = await Chat.findById(chatId, {
-          messages: { $slice: -10 },
+          messages: { $slice: -2 },
+          summary : 1
         });
 
         if (!conversation_already) {
           res.status(500).json({
-            message: "Error while retrieving the previous chats",
+             message: "No previous chats found with the id , given Id is invalid",
           });
           return;
         }
+
         conversation_already.messages.push({
           role: "user",
           content: message,
@@ -95,20 +179,21 @@ const handleChat = async (req, res) => {
         await conversation_already.save();
       } catch (error) {
         res.status(500).json({
-          message: "Error while retrieving the chat , no chat found",
+          message: "Error while retrieving/saving the chat",
           error: error.message,
         });
         return;
       }
     }
 
-    // console.log(conversation_already)
+     // If the model provided by the user is "auto"
 
     if (model == "auto") {
       model = await autoselectmodel(message);
     }
 
-    let available_models = Object.keys(KeyWordMap);
+     // check if user gave us a valid model
+    let available_models = Object.keys(keywords);
 
     if (!available_models.includes(model)) {
       res.status(400).json({
@@ -116,6 +201,9 @@ const handleChat = async (req, res) => {
       });
       return;
     }
+
+
+    //-------- If the model choosen by the user was Claude
 
     if (model == "claude") {
       let messagesList = []
@@ -199,40 +287,30 @@ const handleChat = async (req, res) => {
     // i am using a local model gemma:2b for testing purposes as API free trial
     // ran out
     else if (model == "gemma") {
-      let messagesList = []
+      try {
+      let messagesList = [{
+        role : "system",
+        content : "Always say Hello Ronit in start of your responses"
+      }]
         for (const message of conversation_already.messages) {
           messagesList.push({
             role : message.role,
             content : message.content
           })
         }
-      const query = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      
+        const response = await ollama.chat({
           model : "gemma:2b",
           messages : messagesList,
-          stream: false,
-        }),
-      };
+          stream : false
+      })
 
-      const response = await fetch(local_url, query);
-
-      if (!response.ok) {
-        const error_details = await response.json();
-        res.status(400).json({
-          error: "An error occured while retrieving the response",
-          error_details,
-        });
-        return;
-      }
-      try {
-        const answer = await response.json();
-        // console.log(answer);
-        response_string = answer["message"]["content"];
+       response_string = response.message.content;
+      
+       
       } catch (error) {
         res.status(400).json({
-          error: "Ollama Gemma failed",
+           err : error.message
         });
         return;
       }
@@ -285,6 +363,7 @@ const handleChat = async (req, res) => {
         model,
       });
 
+
       await conversation_already.save();
     } catch (error) {
       res.status(500).json({
@@ -310,8 +389,6 @@ const handleChat = async (req, res) => {
 
 // ========== controller to allow user to get past chats Title when
 // landing on screen1
-const mongoose = require("mongoose");
-const Chat = require("./model");
 
 const getConversationTitle = async (req, res) => {
   try {
@@ -395,5 +472,5 @@ module.exports = {
   getConversationTitle,
   createConversation,
   updateConversation,
-  getConversationMessages,
+  getConversationMessages
 };
