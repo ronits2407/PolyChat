@@ -183,7 +183,6 @@ const handleChat = async (req, res) => {
 
         // get the previous conversations from database and store it in conversation_already
         conversation_already = await Chat.findById(chatId, {
-          messages: { $slice: -2 },
           summary : 1
         });
 
@@ -238,7 +237,6 @@ const handleChat = async (req, res) => {
 
           ### Inputs
           - **Last Chats Summary:** ${conversation_already.summary || "no summary"}
-          - **Last Chat Content:** ${JSON.stringify(conversation_already.messages.slice(-2)) || "this is the first chat"}
 
           ### Task
           1. **Update the Summary**  
@@ -337,7 +335,6 @@ const handleChat = async (req, res) => {
           parts : [{
             text : `
             Previous summary  ${conversation_already.summary || "none"}
-            Previous chat: ${JSON.stringify(conversation_already.messages.slice(-2)) || "this is the first chat"}
                 
 
                 Current user question: ${message}
@@ -393,7 +390,6 @@ const handleChat = async (req, res) => {
           content: `
             You are a helpful assistant.
             past content summary: ${conversation_already.summary || "none"}
-            Last chat content: ${JSON.stringify(conversation_already.messages.slice(-2)) || "none"}
             
             TASK: 
             1. Answer the user's current question.
