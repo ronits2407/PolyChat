@@ -7,7 +7,7 @@ const { GoogleGenAI  } = require("@google/genai");
 const ollama = require("ollama").default
 const mongoose = require("mongoose");
 const Chat = require("./model");
-const {keywordMap, keywords} = require("./keywords");
+const keywordMap = require("./keywords");
 
 
 //---------------------------
@@ -103,8 +103,8 @@ async function autoselectmodel(message, summary = null, lastchat = null) {
     let lower_message = message.toLowerCase();
 
     // check for values in model kwywords manually
-    for (const key in keywords) {
-      for (const element of keywords[key]) {
+    for (const key in keywordMap) {
+      for (const element of keywordMap[key]) {
         if (lower_message.includes(element)) {
           return key;
         }
@@ -128,26 +128,27 @@ const handleChat = async (req, res) => {
       return;
     }
 
-     // create a variable for storing the current conversation previous chats
-    let conversation_already
+    // create a variable for storing the current conversation previous chats
+    let conversation_already;
 
     if (!chatId) {
       try {
         // if this is a new chat first create it in databse and assign conversation_already the value of chat
         const newConversation = new Chat({
-          title : message,
-          messages : [{
-            role : "user",
-            content : message,
-            model,
-          }]
+          title: message,
+          messages: [
+            {
+              role: "user",
+              content: message,
+              model,
+            },
+          ],
         });
 
         await newConversation.save();
 
         chatId = newConversation._id;
         conversation_already = newConversation;
-
       } catch (error) {
         res.status(500).json({
           message: "Error while creating a chat",
@@ -157,16 +158,16 @@ const handleChat = async (req, res) => {
       }
     } else {
       try {
-
         // get the previous conversations from database and store it in conversation_already
         conversation_already = await Chat.findById(chatId, {
-          messages: { $slice: -2 },
-          summary : 1
+          messages: { $slice: -3 },
+          summary: 1,
         });
 
         if (!conversation_already) {
           res.status(500).json({
-             message: "No previous chats found with the id , given Id is invalid",
+            message:
+              "No previous chats found with the id , given Id is invalid",
           });
           return;
         }
@@ -186,14 +187,14 @@ const handleChat = async (req, res) => {
       }
     }
 
-     // If the model provided by the user is "auto"
+    // If the model provided by the user is "auto"
 
     if (model == "auto") {
       model = await autoselectmodel(message);
     }
 
-     // check if user gave us a valid model
-    let available_models = Object.keys(keywords);
+    // check if user gave us a valid model
+    let available_models = Object.keys(keywordMap);
 
     if (!available_models.includes(model)) {
       res.status(400).json({
@@ -202,21 +203,20 @@ const handleChat = async (req, res) => {
       return;
     }
 
-
     //-------- If the model choosen by the user was Claude
 
     if (model == "claude") {
-      let messagesList = []
+      let messagesList = [];
       for (const message of conversation_already.messages) {
         messagesList.push({
-          role : message.role,
-          content : message.content,
-        })
+          role: message.role,
+          content: message.content,
+        });
       }
       const response = await client_anthropic.messages.create({
         model: "claude-sonnet-4-5",
-        max_tokens : 1000,
-        messages: messagesList
+        max_tokens: 1000,
+        messages: messagesList,
       });
 
       if (!response || !response.content) {
@@ -233,12 +233,12 @@ const handleChat = async (req, res) => {
       }
     } else if (model == "chatgpt") {
       try {
-        let messageList = []
+        let messageList = [];
         for (const message of conversation_already.messages) {
           messageList.push({
-            role : message.role,
-            content : message.content
-          })
+            role: message.role,
+            content: message.content,
+          });
         }
         const response = await client_openai.responses.create({
           model: "gpt-4.1-mini",
@@ -256,23 +256,23 @@ const handleChat = async (req, res) => {
 
         response_string = response.output_text;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     } else if (model == "gemini") {
-      let messageList = []
+      let messageList = [];
       for (const message of conversation_already.messages) {
         messageList.push({
-            role : ((message.role == "user") ? "user":"model"),
-            parts : [
-              {
-                text : message.content
-              }
-            ]
-          })
+          role: message.role == "user" ? "user" : "model",
+          parts: [
+            {
+              text: message.content,
+            },
+          ],
+        });
       }
       const response = await client_google.models.generateContent({
         model: "gemini-2.5-flash",
-        contents : messageList
+        contents: messageList,
       });
 
       if (!response) {
@@ -284,73 +284,37 @@ const handleChat = async (req, res) => {
 
       response_string = response.text;
     }
-    // i am using a local model gemma:2b for testing purposes as API free trial
+    // i am using a local model gemma and mistral for testing purposes as API free trial
     // ran out
-    else if (model == "gemma") {
+    else if (model == "mistral" || model == "gemma") {
       try {
-      let messagesList = [{
-        role : "system",
-        content : "Always say Hello Ronit in start of your responses"
-      }]
-        for (const message of conversation_already.messages) {
-          messagesList.push({
-            role : message.role,
-            content : message.content
-          })
-        }
-      
-        const response = await ollama.chat({
-          model : "gemma:2b",
-          messages : messagesList,
-          stream : false
-      })
-
-       response_string = response.message.content;
-      
-       
-      } catch (error) {
-        res.status(400).json({
-           err : error.message
-        });
-        return;
-      }
-    }
-    else if (model == "mistral") {
-      try {
-        let messageList = []
+        let messageList = [{
+          role : "system",
+          content : `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}
+          `
+        }];
         for (const message of conversation_already.messages) {
           messageList.push({
-            role : message.role,
-            content : message.content
-          })
+            role: message.role,
+            content: message.content,
+          });
         }
 
-      const query = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model : "mistral:7b",
-          messages : messageList,
-          stream: false,
-        }),
-      };
+        const response = await ollama.chat({
+            model: ((model == "mistral") ? "mistral:7b":"gemma:2b"),
+            messages: messageList,
+            stream: false,
+          })
 
-      const response = await fetch(local_url, query);
+        
 
-      if (!response.ok) {
-        const error_details = await response.json();
+        response_string = response.message.content;
+      
+       
+      } 
+      catch (error) {
         res.status(400).json({
-          error: "An error occured while retrieving the response",
-          error_details,
-        });
-        return;
-      }
-        const answer = await response.json();
-        // console.log(answer);
-        response_string = answer["message"]["content"];
-      } catch (error) {
-        res.status(400).json({
-          error: "Ollama Mistral failed",
+          err: error.message,
         });
         return;
       }
@@ -363,6 +327,7 @@ const handleChat = async (req, res) => {
         model,
       });
 
+      
 
       await conversation_already.save();
     } catch (error) {
@@ -373,18 +338,47 @@ const handleChat = async (req, res) => {
       return;
     }
 
+
     res.status(200).json({
       chatId,
       model,
       message: response_string,
     });
+
+    // after backend has sent response then update the current summery using a local model
+    try {
+      const new_summary = await ollama.chat({
+        model : process.env.DEFAULT_SUMMERY_MODEL,
+        messages : [{
+          role : "system",
+          content : `Take the previous summery ,current user question and your response to make a new summary(less than 150 words response) of the conversation combining everything without starting with e.g "here's the new summery" 
+          Previous summery : ${conversation_already.summary}
+          User question : ${message}
+          Model Response : ${response_string}
+          
+          NOTE :- Only include the key details and NOT everything in detail and make it SHORT
+          NOTE :- Do not include heaters or footers like "Sure heres your summary.." or any reference to this system prompts 
+          `
+
+          
+      }]
+      })
+
+      conversation_already.summary = new_summary.message.content
+    } 
+    catch (error) {
+      console.log("Could not develop summery\n"+error)
+    }
+
+    await conversation_already.save()
+
+
     return;
   } catch (error) {
     res
       .status(500)
       .json({ message: "Error handling chat", error: error.message });
   }
-  return;
 };
 
 // ========== controller to allow user to get past chats Title when

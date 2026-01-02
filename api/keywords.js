@@ -29,7 +29,8 @@ const keywordMap = {
       "review",
     ],
     "gemma":[],
-    "mistral":[]
+    "mistral":[],
+    "auto":[]
   };
 
 module.exports = keywordMap

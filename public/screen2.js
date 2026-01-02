@@ -72,6 +72,7 @@ async function getTitles() {
   } 
   catch (error) {
     console.error(error);
+    alert(error.message)
   }
 };
 
