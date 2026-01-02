@@ -23,7 +23,7 @@ const { GoogleGenAI  } = require("@google/genai");
 const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // gemma:2b local model for testing
-const local_url = "http://localhost:11434/api/generate";
+const local_url = "http://localhost:11434/api/chat";
 
 async function autoselectmodel(message) {
   let lower_message = message.toLowerCase();
@@ -36,7 +36,7 @@ async function autoselectmodel(message) {
     }
   }
 
-  return process.env.DEFAULT_MODEL || "gpt-4o";
+  return process.env.DEFAULT_MODEL || "gemma";
 }
 
 const handleChat = async (req, res) => {
@@ -117,7 +117,7 @@ const handleChat = async (req, res) => {
       return;
     }
 
-    if (model == "claude-2.5") {
+    if (model == "claude") {
       let messagesList = []
       for (const message of conversation_already.messages) {
         messagesList.push({
@@ -143,7 +143,7 @@ const handleChat = async (req, res) => {
           response_string = response_string + block.text;
         }
       }
-    } else if (model == "gpt-4o") {
+    } else if (model == "chatgpt") {
       try {
         let messageList = []
         for (const message of conversation_already.messages) {
@@ -170,7 +170,7 @@ const handleChat = async (req, res) => {
       } catch (error) {
         console.log(error)
       }
-    } else if (model == "gemini-3.5-pro") {
+    } else if (model == "gemini") {
       let messageList = []
       for (const message of conversation_already.messages) {
         messageList.push({
@@ -198,13 +198,20 @@ const handleChat = async (req, res) => {
     }
     // i am using a local model gemma:2b for testing purposes as API free trial
     // ran out
-    else if (model == "gemma:2b") {
+    else if (model == "gemma") {
+      let messagesList = []
+        for (const message of conversation_already.messages) {
+          messagesList.push({
+            role : message.role,
+            content : message.content
+          })
+        }
       const query = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model,
-          prompt: message,
+          model : "gemma:2b",
+          messages : messagesList,
           stream: false,
         }),
       };
@@ -222,10 +229,50 @@ const handleChat = async (req, res) => {
       try {
         const answer = await response.json();
         // console.log(answer);
-        response_string = answer["response"];
+        response_string = answer["message"]["content"];
       } catch (error) {
         res.status(400).json({
-          error: "Ollama failed",
+          error: "Ollama Gemma failed",
+        });
+        return;
+      }
+    }
+    else if (model == "mistral") {
+      try {
+        let messageList = []
+        for (const message of conversation_already.messages) {
+          messageList.push({
+            role : message.role,
+            content : message.content
+          })
+        }
+
+      const query = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model : "mistral:7b",
+          messages : messageList,
+          stream: false,
+        }),
+      };
+
+      const response = await fetch(local_url, query);
+
+      if (!response.ok) {
+        const error_details = await response.json();
+        res.status(400).json({
+          error: "An error occured while retrieving the response",
+          error_details,
+        });
+        return;
+      }
+        const answer = await response.json();
+        // console.log(answer);
+        response_string = answer["message"]["content"];
+      } catch (error) {
+        res.status(400).json({
+          error: "Ollama Mistral failed",
         });
         return;
       }

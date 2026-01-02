@@ -327,6 +327,17 @@ div.response {
   margin-bottom: 23px;
 }
 
+hr{
+  /* display: none; */
+  animation: loading 2s linear infinite;
+}
+
+@keyframes loading{
+  0%{width: 0%;}
+  50%{width: 100%;}
+  100%{width: 0%;}
+}
+
 div.response-info {
   align-self: stretch;
   display: flex;

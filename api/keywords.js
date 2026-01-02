@@ -1,5 +1,5 @@
 const keywordMap = {
-    "gemini-3.5-pro": [
+    "gemini": [
       "who is",
       "what is",
       "define",
@@ -9,7 +9,7 @@ const keywordMap = {
       "price",
       "date",
     ],
-    "gpt-4o": [
+    "chatgpt": [
       "explain",
       "step by step",
       "why",
@@ -19,7 +19,7 @@ const keywordMap = {
       "solve",
       "debug",
     ],
-    "claude-2.5": [
+    "claude": [
       "summarize this document",
       "analyze",
       "long essay",
@@ -28,7 +28,8 @@ const keywordMap = {
       "report",
       "review",
     ],
-    "gemma:2b":[]
+    "gemma":[],
+    "mistral":[]
   };
 
 module.exports = keywordMap
