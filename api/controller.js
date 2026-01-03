@@ -8,6 +8,7 @@ const ollama = require("ollama").default
 const mongoose = require("mongoose");
 const Chat = require("./model");
 const keywordMap = require("./keywords");
+const fs = require("fs")
 
 
 //---------------------------
@@ -44,6 +45,22 @@ const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 
 
+function angleBetween(A, B){
+  // calculate the angle between these twp vectors
+
+  let dot = 0;
+  let mag_A = 0;
+  let mag_B = 0;
+
+  for (let i = 0; i < A.length; i++) {
+    dot += A[i] * B[i];
+    mag_A += A[i] * A[i];
+    mag_B += B[i] * B[i];
+  }
+
+  return (dot / (Math.sqrt(mag_A)) * (Math.sqrt(mag_B)))
+}
+
 
 
 
@@ -54,9 +71,17 @@ const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 //------------------- Function to decide the Model to respond based on user message in AUTO mode
 
-async function autoselectmodel(message, summary = null, lastchat = null) {
+async function autoselectmodel(message) {
   // SET the model which is going to predict the model for this particular message
-  let methods = ["gemma", "chatgpt", "gemini", "claude", "mistral", "manual"];
+  let methods = [
+    "gemma",
+    "chatgpt",
+    "gemini",
+    "claude",
+    "mistral",
+    "manual",
+    "semantic",
+  ];
 
   const method = process.env.DEFAULT_MODEL_SELECTION_METHOD;
 
@@ -74,9 +99,14 @@ async function autoselectmodel(message, summary = null, lastchat = null) {
           {
             role: "system",
             content: `
-            Based on the given summary and the last chat analyse the user intent of the conversation and classify the message into one of 5 model categories as per the user requirement. Following is the raw classification keywords : ${keywordMap} Following is the user messages summary : ${summary} Following is the most recent conversation of user : ${lastchat}
+            Based on the given user message analyse the user intent of the conversation and classify the message into one of 5 model categories as per the user requirement.
+            
+            Following is the raw classification keywords : ${keywordMap} 
 
-            NOTE => OUTPUT A SINGLE key value pair object named with the key "predictedModel" i.e the name of one of the model from Keyword object 
+            Output format , a JSON object with single property
+            {
+              "model" : <one of the model form 5 model categries>
+            } 
             `,
           },
           {
@@ -86,10 +116,11 @@ async function autoselectmodel(message, summary = null, lastchat = null) {
         ],
         format: {
           type: "object",
-          predictedModel: {
+          model : {
             type: "string",
+            enum : ["gemini", "chatgpt", "gemma", "claude", "mistral"]
           },
-          required: ["predictedModel"],
+          required: ["model"],
         },
       });
 
@@ -112,6 +143,43 @@ async function autoselectmodel(message, summary = null, lastchat = null) {
     }
 
     return process.env.DEFAULT_MODEL || "gemma";
+  } else if (method == "semantic") {
+    // check the model based on the most matched vector 
+
+    let response = await ollama.embed({
+      model : "mistral:7b",
+      input  : message,
+    })
+    
+    const userVector = response.embeddings[0];
+
+    // check this vector against all embeddings in generated manifest
+    const embeddingsFile  = JSON.parse(fs.readFileSync("./api/manifest.json", "utf8"))
+
+    let defaultModel = {
+      model : "chatgpt", // set a default model in case none mathces,
+      score : 0
+    }
+
+    for (const model of embeddingsFile) {
+      for (const embedding of model.embeddings) {
+        let scoreCurrent = angleBetween(embedding, userVector);
+
+        if (scoreCurrent > defaultModel.score) {
+          defaultModel.model = model.model,
+          defaultModel.score = scoreCurrent
+        }
+      }
+    }
+
+    if (defaultModel.score < 0.6) {
+      // defaultModel.model = "chatgpt" // in case no vector is matching
+    }
+
+    return defaultModel.model;
+
+    
+
   }
 }
 
@@ -191,6 +259,7 @@ const handleChat = async (req, res) => {
 
     if (model == "auto") {
       model = await autoselectmodel(message);
+      console.log(model)
     }
 
     // check if user gave us a valid model
