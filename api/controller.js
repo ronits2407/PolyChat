@@ -153,8 +153,8 @@ async function autoselectmodel(message) {
     
     const userVector = response.embeddings[0];
 
-    // check this vector against all embeddings in generated manifest
-    const embeddingsFile  = JSON.parse(fs.readFileSync("./api/manifest.json", "utf8"))
+    // check this vector against all embeddings in generated Embeddings
+    const embeddingsFile  = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"))
 
     let defaultModel = {
       model : "chatgpt", // set a default model in case none mathces,
