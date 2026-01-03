@@ -7,7 +7,6 @@ dotenv.config()
 async function GenerateManifest(){
     const manifest_old = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf-8"));
 
-    console.log("Creating Embeddings...")
 
     for (const model of manifest_old) {
         for (const sentense of model.examples) {
@@ -29,7 +28,7 @@ async function GenerateManifest(){
         }
     }
 
-    fs.writeFileSync("./api/manifest.json", JSON.stringify(manifest_old, null, 2))
+    fs.writeFileSync("./api/embeddingPhrases.json", JSON.stringify(manifest_old, null, 2))
 
 
 }

@@ -146,37 +146,82 @@ async function autoselectmodel(message) {
   } else if (method == "semantic") {
     // check the model based on the most matched vector 
 
-    let response = await ollama.embed({
-      model : "mistral:7b",
-      input  : message,
-    })
-    
-    const userVector = response.embeddings[0];
+    try {
+      let response = await ollama.embed({
+        model : "mistral:7b",
+        input  : message,
+      })
+      
+      const userVector = response.embeddings[0];
+  
+      // check this vector against all embeddings in generated Embeddings
+      const embeddingsFile  = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"))
+  
+      let defaultModel = {
+        model : "chatgpt", // set a default model in case none mathces,
+        score : 0
+      }
+  
+      for (const model of embeddingsFile) {
+        for (const embedding of model.embeddings) {
+          let scoreCurrent = angleBetween(embedding, userVector);
+  
+          if (scoreCurrent > defaultModel.score) {
+            defaultModel.model = model.model,
+            defaultModel.score = scoreCurrent
+          }
+        }
+      }
+  
+      return defaultModel.model;
+      
 
-    // check this vector against all embeddings in generated Embeddings
-    const embeddingsFile  = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"))
+    }// if ollama fails to load 
+    catch (error) {
+      try {
+
+    const response = await openai.embeddings.create({
+
+        model: "text-embedding-3-small",
+        input: message,
+    });
+
+
+    const userVector = response.data[0].embedding;
+
+    
+    const embeddingsFile = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"));
 
     let defaultModel = {
-      model : "chatgpt", // set a default model in case none mathces,
-      score : 0
+        model: "chatgpt", 
+        score: 0
+    };
+
+    
+    for (const modelData of embeddingsFile) {
+
+        for (const embedding of modelData.embeddings) {
+
+            let scoreCurrent = angleBetween(embedding, userVector);
+
+            if (scoreCurrent > defaultModel.score) {
+                defaultModel.model = modelData.model;
+                defaultModel.score = scoreCurrent;
+            }
+        }
     }
 
-    for (const model of embeddingsFile) {
-      for (const embedding of model.embeddings) {
-        let scoreCurrent = angleBetween(embedding, userVector);
-
-        if (scoreCurrent > defaultModel.score) {
-          defaultModel.model = model.model,
-          defaultModel.score = scoreCurrent
-        }
+    
+    return defaultModel.score;
+      } catch (error) {
+        console.error("failed to fetch the embeddings")
+        res.status(500).json({
+          message : "Failed to get an answer",
+          err : error.message
+        })
       }
     }
 
-    if (defaultModel.score < 0.6) {
-      // defaultModel.model = "chatgpt" // in case no vector is matching
-    }
-
-    return defaultModel.model;
 
     
 
