@@ -2,10 +2,11 @@ Please go through the following steps in order to run the project
 
 1 Install Ollama on your device
 
-2 Install the lightweight `gemma:2b` and `mistral:7b` models in your Ollama 
+2 Install the lightweight `gemma:2b` and `mistral:7b` and `mxbai-embed-large` models in your Ollama 
 by 
 `ollama pull gemma:2b`
 `ollama pull mistral:7b`
+`ollama pull mxbai-embed-large`
 
 3 After it is installed start the ollama server first
 `ollama serve`

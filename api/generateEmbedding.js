@@ -12,7 +12,7 @@ async function GenerateManifest(){
         for (const sentense of model.examples) {
             try {
                 const response = await ollama.embed({
-                    model : "mistral:7b",
+                    model : "mxbai-embed-large",
                     input: sentense,
                 })
 

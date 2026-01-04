@@ -148,7 +148,7 @@ async function autoselectmodel(message) {
 
     try {
       let response = await ollama.embed({
-        model : "mistral:7b",
+        model : "mxbai-embed-large",
         input  : message,
       })
       
@@ -179,7 +179,7 @@ async function autoselectmodel(message) {
     }// if ollama fails to load 
     catch (error) {
       try {
-
+        console.log("Ollama falied to embed")
     const response = await openai.embeddings.create({
 
         model: "text-embedding-3-small",
