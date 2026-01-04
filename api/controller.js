@@ -190,7 +190,7 @@ async function autoselectmodel(message) {
     const userVector = response.data[0].embedding;
 
     
-    const embeddingsFile = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"));
+    const embeddingsFile = JSON.parse(fs.readFileSync("./api/embeddingPhrases-openai.json", "utf8"));
 
     let defaultModel = {
         model: "chatgpt", 
