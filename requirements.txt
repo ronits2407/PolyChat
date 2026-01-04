@@ -1,5 +1,0 @@
-Please download Ollama from the below link for availing complete features of this project
-https://ollama.com/download/windows
-
-
-

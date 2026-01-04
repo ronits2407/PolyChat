@@ -28,6 +28,7 @@ async function GenerateManifest() {
         console.log(`Embedded`);
       } catch (error) {
         console.error(`Error\n`, error.message);
+        return
       }
     }
   }
