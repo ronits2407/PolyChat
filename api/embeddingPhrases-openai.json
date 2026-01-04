@@ -1,71 +1,71 @@
 [
   {
     "model": "chatgpt",
-    "description": "General purpose all-rounder, great for casual chat and multimodal tasks.",
+    "description": "The polished all-rounder. Best for creative ideation, human-like dialogue, and multimodal brainstorming.",
     "examples": [
-      "Hey, how's your day going?",
-      "Can you help me plan a 3-day trip to Tokyo?",
-      "Write a polite email to my boss about taking a sick day.",
-      "Tell me a funny joke about a programmer and a lightbulb.",
-      "What are some good gift ideas for a 10-year-old who likes space?",
-      "I have an image of a plant, can you tell me what species it is?",
-      "Summarize the main news headlines from this morning."
+      "Write a short story about a time-traveling chef in the style of Hemingway.",
+      "Brainstorm 10 unique names for a boutique sustainable clothing brand.",
+      "Critique this marketing copy and suggest a more persuasive tone.",
+      "Act as a travel guide and plan a niche 'hidden gems' itinerary for Kyoto.",
+      "What are some creative ways to explain photosynthesis to a 5-year-old?",
+      "Tell me a joke that only a data scientist would find funny.",
+      "Look at this photo of my fridge and suggest three dinner recipes."
     ],
     "embeddings": []
   },
   {
     "model": "gemini",
-    "description": "Long-context king. Best for massive files, video analysis, and Google ecosystem tasks.",
+    "description": "The long-context and ecosystem powerhouse. Best for massive data retrieval and Google-integrated workflows.",
     "examples": [
-      "Search my Google Drive for the final contract from last year.",
-      "Summarize this 400-page PDF document in 10 bullet points.",
-      "I'm uploading a 2-hour video, find the part where they discuss the budget.",
-      "Analyze this entire codebase and find where the memory leak is happening.",
-      "Look through these 50 spreadsheets and tell me which region had the highest growth.",
-      "Draft a response to this email thread considering all previous 20 messages.",
-      "Explain the connections between these three different research papers."
+      "Analyze this 1,000-page technical manual and find the section on circuit safety.",
+      "Summarize the key takeaways from this 2-hour recorded meeting video.",
+      "Find the specific email in my Drive where we discussed the Q3 budget changes.",
+      "Compare the financial results across these 20 different PDF annual reports.",
+      "Draft a follow-up email based on the context of this entire 50-message thread.",
+      "Extract every mention of 'Project Phoenix' from these uploaded project files.",
+      "Translate this entire documentation folder from English into 5 different languages."
     ],
     "embeddings": []
   },
   {
-    "model": "claude",
-    "description": "The logic and coding specialist. High-end reasoning and technical writing.",
+    "model": "cohere",
+    "description": "The Enterprise RAG and Search specialist. Optimized for groundedness, citations, and business utility.",
     "examples": [
-      "Write a complex React component with custom hooks and TypeScript.",
-      "Explain the mathematical proof behind the Riemann Hypothesis in simple terms.",
-      "Draft a detailed 2000-word whitepaper on the future of renewable energy.",
-      "Refactor this Python script to be more efficient and follow PEP8 standards.",
-      "I have a complex logic puzzle: if A is true and B is false, what happens to C?",
-      "Provide a deep architectural review of this microservices diagram.",
-      "Help me write a philosophical essay about the ethics of artificial intelligence."
+      "Search our internal knowledge base to answer: What is our remote work policy?",
+      "Rerank these search results to prioritize relevance for a legal professional.",
+      "Classify these 500 customer support tickets into 'Urgent', 'Billing', or 'Tech'.",
+      "Summarize this contract while citing the specific clauses for every claim made.",
+      "Identify the intent of this user query: 'I can't access my portal since Tuesday'.",
+      "Extract all product SKUs and quantities from this messy supply chain log.",
+      "Generate a grounded response to this client based ONLY on the provided whitepaper."
     ],
     "embeddings": []
   },
   {
     "model": "gemma",
-    "description": "Fast, lightweight assistant. Best for simple, high-frequency utility tasks.",
+    "description": "The lightweight utility assistant. Best for fast, on-device text processing and simple conversions.",
     "examples": [
-      "What is the capital of Kazakhstan?",
-      "Translate 'Where is the library?' into Spanish.",
-      "Convert 50 kilograms into pounds.",
-      "What is 15% of 240?",
-      "Give me a quick 2-sentence summary of what a black hole is.",
-      "Define the word 'percipient'.",
-      "What is the current date and time?"
+      "What is the square root of 144?",
+      "Rewrite this paragraph to be more professional and concise.",
+      "Translate 'The weather is beautiful today' into French.",
+      "Convert 100 USD into Japanese Yen at the current estimated rate.",
+      "Provide a 2-sentence definition of 'Quantum Entanglement'.",
+      "Is this sentence grammatically correct: 'They was going to the store'?",
+      "List the primary colors in the RGB spectrum."
     ],
     "embeddings": []
   },
   {
     "model": "mistral",
-    "description": "Efficiency specialist. Great for structured data, JSON, and concise instructions.",
+    "description": "The efficiency and logic specialist. Best for structured data, coding, and system-level tasks.",
     "examples": [
-      "Extract the names and dates from this text and return it as a JSON object.",
-      "Format this messy list of addresses into a clean CSV structure.",
-      "Rewrite this paragraph to be exactly 50 words long.",
-      "Check this text for grammar errors and return a list of corrections.",
-      "Classify the following customer reviews as Positive, Negative, or Neutral.",
-      "Generate a structured schema for a library database.",
-      "Parse this raw log file and highlight all 'Critical' error lines."
+      "Convert this unstructured text list of names and roles into a valid JSON array.",
+      "Refactor this Python function to reduce time complexity from O(n^2) to O(n).",
+      "Generate a SQL schema for a multi-tenant e-commerce database.",
+      "Parse this raw server log and return only the lines containing 404 errors.",
+      "Write a regex pattern to validate international phone numbers.",
+      "Logic check: If all A are B, and some B are C, is it certain that some A are C?",
+      "Modularize this monolithic JavaScript file into clean, reusable ES6 modules."
     ],
     "embeddings": []
   }

@@ -30,3 +30,6 @@ by
 since i do not have any idea of what the personality of any model is, i have used AI for generating the `examples` corresponding to each AI in the `embeddingPhrases.js` and `embeddingPhrases-openai.js` for e.g for claude :- `help me write this code` is an example as claude is good in coding , i did not know this therefore this portion was AI generated
 
 Also the `keywords` for each model in the `keywords.js` is AI generated as i do not know what are the keywords for each AI and their personality e.g it generated `summarise` for `gemma:2b` model which is impoosible to figure out myself as i am not a MODEL engineer
+
+
+NOTE => I realised after the `claude` was replaced with `cohere` thereofore i have made the corrections on code but in Video i have used `claude` only

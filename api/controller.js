@@ -9,6 +9,9 @@ const mongoose = require("mongoose");
 const Chat = require("./model");
 const keywordMap = require("./keywords");
 const fs = require("fs")
+const { CohereClientV2 } = require('cohere-ai');
+const { text } = require("stream/consumers");
+
 
 
 //---------------------------
@@ -26,10 +29,10 @@ const fs = require("fs")
 
 // ----------------------------------Load the models ==================
 
-// Claude
-const client_anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// Cohere
+const cohere = new CohereClientV2({
+   token: process.env.COHERE_API_KEY 
+  });
 
 // GPT-4o
 const client_openai = new OpenAI({
@@ -77,7 +80,7 @@ async function autoselectmodel(message) {
     "gemma",
     "chatgpt",
     "gemini",
-    "claude",
+    "cohere",
     "mistral",
     "manual",
     "semantic",
@@ -118,7 +121,7 @@ async function autoselectmodel(message) {
           type: "object",
           model : {
             type: "string",
-            enum : ["gemini", "chatgpt", "gemma", "claude", "mistral"]
+            enum : ["gemini", "chatgpt", "gemma", "cohere", "mistral"]
           },
           required: ["model"],
         },
@@ -321,35 +324,43 @@ const handleChat = async (req, res) => {
 
     //-------- If the model choosen by the user was Claude
 
-    if (model == "claude") {
-      let messagesList = [];
+    if (model == "cohere") {
+      let messagesList = [{
+        role : "system",
+        content : `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}`
+      }];
+      
       for (const message of conversation_already.messages) {
         messagesList.push({
           role: message.role,
           content: message.content,
         });
       }
-      const response = await client_anthropic.messages.create({
-        model: "claude-sonnet-4-5",
-        max_tokens: 1000,
-        messages: messagesList,
-      });
 
-      if (!response || !response.content) {
+      const response = await cohere.chat({
+        model: "command-a-03-2025",
+        messages: messagesList
+      });
+      
+      if (!response.message) {
         res.status(400).json({
-          error: "The Anthropic model did not give any textual response",
+          error: "The Cohere model did not give any textual response",
         });
         return;
       }
 
-      for (const block of response.content) {
-        if (block.type == "text") {
-          response_string = response_string + block.text;
-        }
-      }
+      response_string = response.message.content[0].text
     } else if (model == "chatgpt") {
       try {
-        let messageList = [];
+        let messageList = [
+          {
+            role: "system",
+            content: `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}
+        also don't include starters like "based on the summary this is the answer..", in short don't give any reference of this summary
+        treat this as a system prompt
+        `,
+          },
+        ];
         for (const message of conversation_already.messages) {
           messageList.push({
             role: message.role,
@@ -388,6 +399,13 @@ const handleChat = async (req, res) => {
       }
       const response = await client_google.models.generateContent({
         model: "gemini-2.5-flash",
+        system_instructions : {
+          parts : [
+            {
+              text : `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}`
+            }
+          ]
+        },
         contents: messageList,
       });
 
@@ -404,11 +422,18 @@ const handleChat = async (req, res) => {
     // ran out
     else if (model == "mistral" || model == "gemma") {
       try {
-        let messageList = [{
-          role : "system",
-          content : `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}
-          `
-        }];
+        let messageList = [
+          {
+            role: "system",
+            content: `### Conversation History
+                      ${conversation_already.summary || "None"}
+
+                      ### Instructions
+                      1 Answer the user's next message directly
+                      2 Use the History ONLY if the user asks about past topics
+                      3 DO NOT mention "the summary", "based on previous chats", or "context" in your response`,
+          },
+        ];
         for (const message of conversation_already.messages) {
           messageList.push({
             role: message.role,
