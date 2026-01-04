@@ -1,0 +1,72 @@
+[
+  {
+    "model": "chatgpt",
+    "description": "General purpose all-rounder, great for casual chat and multimodal tasks.",
+    "examples": [
+      "Hey, how's your day going?",
+      "Can you help me plan a 3-day trip to Tokyo?",
+      "Write a polite email to my boss about taking a sick day.",
+      "Tell me a funny joke about a programmer and a lightbulb.",
+      "What are some good gift ideas for a 10-year-old who likes space?",
+      "I have an image of a plant, can you tell me what species it is?",
+      "Summarize the main news headlines from this morning."
+    ],
+    "embeddings": []
+  },
+  {
+    "model": "gemini",
+    "description": "Long-context king. Best for massive files, video analysis, and Google ecosystem tasks.",
+    "examples": [
+      "Search my Google Drive for the final contract from last year.",
+      "Summarize this 400-page PDF document in 10 bullet points.",
+      "I'm uploading a 2-hour video, find the part where they discuss the budget.",
+      "Analyze this entire codebase and find where the memory leak is happening.",
+      "Look through these 50 spreadsheets and tell me which region had the highest growth.",
+      "Draft a response to this email thread considering all previous 20 messages.",
+      "Explain the connections between these three different research papers."
+    ],
+    "embeddings": []
+  },
+  {
+    "model": "claude",
+    "description": "The logic and coding specialist. High-end reasoning and technical writing.",
+    "examples": [
+      "Write a complex React component with custom hooks and TypeScript.",
+      "Explain the mathematical proof behind the Riemann Hypothesis in simple terms.",
+      "Draft a detailed 2000-word whitepaper on the future of renewable energy.",
+      "Refactor this Python script to be more efficient and follow PEP8 standards.",
+      "I have a complex logic puzzle: if A is true and B is false, what happens to C?",
+      "Provide a deep architectural review of this microservices diagram.",
+      "Help me write a philosophical essay about the ethics of artificial intelligence."
+    ],
+    "embeddings": []
+  },
+  {
+    "model": "gemma",
+    "description": "Fast, lightweight assistant. Best for simple, high-frequency utility tasks.",
+    "examples": [
+      "What is the capital of Kazakhstan?",
+      "Translate 'Where is the library?' into Spanish.",
+      "Convert 50 kilograms into pounds.",
+      "What is 15% of 240?",
+      "Give me a quick 2-sentence summary of what a black hole is.",
+      "Define the word 'percipient'.",
+      "What is the current date and time?"
+    ],
+    "embeddings": []
+  },
+  {
+    "model": "mistral",
+    "description": "Efficiency specialist. Great for structured data, JSON, and concise instructions.",
+    "examples": [
+      "Extract the names and dates from this text and return it as a JSON object.",
+      "Format this messy list of addresses into a clean CSV structure.",
+      "Rewrite this paragraph to be exactly 50 words long.",
+      "Check this text for grammar errors and return a list of corrections.",
+      "Classify the following customer reviews as Positive, Negative, or Neutral.",
+      "Generate a structured schema for a library database.",
+      "Parse this raw log file and highlight all 'Critical' error lines."
+    ],
+    "embeddings": []
+  }
+]

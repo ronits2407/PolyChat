@@ -7,7 +7,8 @@ const { GoogleGenAI  } = require("@google/genai");
 const ollama = require("ollama").default
 const mongoose = require("mongoose");
 const Chat = require("./model");
-const {keywordMap, keywords} = require("./keywords");
+const keywordMap = require("./keywords");
+const fs = require("fs")
 
 
 //---------------------------
@@ -38,11 +39,27 @@ const client_openai = new OpenAI({
 // Gemini-3.5-pro
 const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+
 // Gemma and Mistral do not need manual loading
 
 
 
 
+function angleBetween(A, B){
+  // calculate the angle between these twp vectors
+
+  let dot = 0;
+  let mag_A = 0;
+  let mag_B = 0;
+
+  for (let i = 0; i < A.length; i++) {
+    dot += A[i] * B[i];
+    mag_A += A[i] * A[i];
+    mag_B += B[i] * B[i];
+  }
+
+  return (dot / (Math.sqrt(mag_A)) * (Math.sqrt(mag_B)))
+}
 
 
 
@@ -54,89 +71,162 @@ const client_google = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 //------------------- Function to decide the Model to respond based on user message in AUTO mode
 
-async function autoselectmodel(message, summary=null, lastchat=null) {
-
+async function autoselectmodel(message) {
   // SET the model which is going to predict the model for this particular message
-  let methods = ["gemma", "chatgpt", "gemini", "claude", "mistral", "manual"]
+  let methods = [
+    "gemma",
+    "chatgpt",
+    "gemini",
+    "claude",
+    "mistral",
+    "manual",
+    "semantic",
+  ];
 
   const method = process.env.DEFAULT_MODEL_SELECTION_METHOD;
 
   // Check if we have a valid method
   if (!methods.includes(method)) {
-    throw new Error("The developer did not choose a valid method")
+    throw new Error("The developer did not choose a valid method");
   }
 
   // If the method was using gemma for predicting the model
   if (method == "gemma") {
     try {
       let predicted_model = await ollama.chat({
-        model : "gemma",
-        messages : [
+        model: "gemma",
+        messages: [
           {
             role: "system",
             content: `
-            Based on the given summary and the last chat analyse the user intent of the conversation and classify the message into one of 5 model categories as per the user requirement. Following is the raw classification keywords : ${keywordMap} Following is the user messages summary : ${summary} Following is the most recent conversation of user : ${lastchat}
+            Based on the given user message analyse the user intent of the conversation and classify the message into one of 5 model categories as per the user requirement.
+            
+            Following is the raw classification keywords : ${keywordMap} 
 
-            NOTE => OUTPUT A SINGLE key value pair object named with the key "predictedModel" i.e the name of one of the model from Keyword object 
-            `
+            Output format , a JSON object with single property
+            {
+              "model" : <one of the model form 5 model categries>
+            } 
+            `,
           },
           {
-            role : "user",
-            content : message,
-          }
-        ],
-        format : {
-          type : "object",
-          predictedModel : {
-            type : "string"
+            role: "user",
+            content: message,
           },
-          required : ["predictedModel"]
-        }
-      })
+        ],
+        format: {
+          type: "object",
+          model : {
+            type: "string",
+            enum : ["gemini", "chatgpt", "gemma", "claude", "mistral"]
+          },
+          required: ["model"],
+        },
+      });
 
-      return predicted_model
-    } 
-
-
-    catch (error) {
-      console.error(error)
+      return predicted_model;
+    } catch (error) {
+      console.error(error);
       // method = "manual"
     }
-  }
-  else if (method == "manual"){
-
+  } else if (method == "manual") {
     // convert the current message to lowercase
-  let lower_message = message.toLowerCase();
+    let lower_message = message.toLowerCase();
 
-  // check for values in model kwywords manually
-  for (const key in keywords) {
-    for (const element of keywords[key]) {
-      if (lower_message.includes(element)) {
-        return key;
+    // check for values in model kwywords manually
+    for (const key in keywordMap) {
+      for (const element of keywordMap[key]) {
+        if (lower_message.includes(element)) {
+          return key;
+        }
       }
     }
-  }
 
-  return process.env.DEFAULT_MODEL || "gemma";
+    return process.env.DEFAULT_MODEL || "gemma";
+  } else if (method == "semantic") {
+    // check the model based on the most matched vector 
+
+    try {
+      let response = await ollama.embed({
+        model : "mistral:7b",
+        input  : message,
+      })
+      
+      const userVector = response.embeddings[0];
+  
+      // check this vector against all embeddings in generated Embeddings
+      const embeddingsFile  = JSON.parse(fs.readFileSync("./api/embeddingPhrases.json", "utf8"))
+  
+      let defaultModel = {
+        model : "chatgpt", // set a default model in case none mathces,
+        score : 0
+      }
+  
+      for (const model of embeddingsFile) {
+        for (const embedding of model.embeddings) {
+          let scoreCurrent = angleBetween(embedding, userVector);
+  
+          if (scoreCurrent > defaultModel.score) {
+            defaultModel.model = model.model,
+            defaultModel.score = scoreCurrent
+          }
+        }
+      }
+  
+      return defaultModel.model;
+      
+
+    }// if ollama fails to load 
+    catch (error) {
+      try {
+
+    const response = await openai.embeddings.create({
+
+        model: "text-embedding-3-small",
+        input: message,
+    });
+
+
+    const userVector = response.data[0].embedding;
+
+    
+    const embeddingsFile = JSON.parse(fs.readFileSync("./api/embeddingPhrases-openai.json", "utf8"));
+
+    let defaultModel = {
+        model: "chatgpt", 
+        score: 0
+    };
+
+    
+    for (const modelData of embeddingsFile) {
+
+        for (const embedding of modelData.embeddings) {
+
+            let scoreCurrent = angleBetween(embedding, userVector);
+
+            if (scoreCurrent > defaultModel.score) {
+                defaultModel.model = modelData.model;
+                defaultModel.score = scoreCurrent;
+            }
+        }
+    }
+
+    
+    return defaultModel.score;
+      } catch (error) {
+        console.error("failed to fetch the embeddings")
+        res.status(500).json({
+          message : "Failed to get an answer",
+          err : error.message
+        })
+      }
+    }
+
+
+    
+
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// =========== controller for getting AI generated responses
 
 const handleChat = async (req, res) => {
   let { message, model, chatId } = req.body;
@@ -152,18 +242,20 @@ const handleChat = async (req, res) => {
     }
 
     // create a variable for storing the current conversation previous chats
-    let conversation_already
+    let conversation_already;
 
     if (!chatId) {
       try {
         // if this is a new chat first create it in databse and assign conversation_already the value of chat
         const newConversation = new Chat({
-          title : message,
-          messages : [{
-            role : "user",
-            content : message,
-            model,
-          }]
+          title: message,
+          messages: [
+            {
+              role: "user",
+              content: message,
+              model,
+            },
+          ],
         });
 
         await newConversation.save();
@@ -180,13 +272,16 @@ const handleChat = async (req, res) => {
       }
     } else {
       try {
-
         // get the previous conversations from database and store it in conversation_already
-        conversation_already = await Chat.findById(chatId);
+        conversation_already = await Chat.findById(chatId, {
+          messages: { $slice: -3 },
+          summary: 1,
+        });
 
         if (!conversation_already) {
           res.status(500).json({
-            message: "No previous chats found with the id , given Id is invalid",
+            message:
+              "No previous chats found with the id , given Id is invalid",
           });
           return;
         }
@@ -206,14 +301,16 @@ const handleChat = async (req, res) => {
       }
     }
 
+    // If the model provided by the user is "auto"
 
     // If the model provided by the user is "auto"
     if (model == "auto") {
       model = await autoselectmodel(message);
+      console.log(model)
     }
 
     // check if user gave us a valid model
-    let available_models = Object.keys(keywords);
+    let available_models = Object.keys(keywordMap);
 
     if (!available_models.includes(model)) {
       res.status(400).json({
@@ -222,255 +319,118 @@ const handleChat = async (req, res) => {
       return;
     }
 
-
     //-------- If the model choosen by the user was Claude
+
     if (model == "claude") {
-
-      // create the message list of the last 2-3 chats so that model knows more clearly what is in the conversation
-      let prompt = {
-        role : "system",
-        content : `
-           Input
-          previous chats summary ${conversation_already.summary || "no summary"}
-
-          task
-          1 Update the summary :- combine existing summary with  current question and your generated answer
-            out put a new summar that contains the updated info
-
-          2 user response:- give answer (response for the current question) to the current question sent by user
-
-          ### Output Format
-          Return a single JSON object as in the tool with the following structure:
-
-          {
-            "userResponse": "<string_of_user_response>",
-            "newSummary": "<string_of_new_summary>"
-          }
-        `
-        }
-        
-        // get response form the model
-        const response = await client_anthropic.messages.create({
-          model: "claude-sonnet-4-5",
-          max_tokens : 1000,
-          messages: [prompt, {
-            role : "user",
-            content : message
-          }],
-          tools : [{
-            name : "response_template",
-            desscription : "This is the model response containing both newSummary and userResponse",
-            input_schema : {
-              type : "object",
-              properties : {
-                userResponse : {type : "string"},
-                newSummary : {type : "string"},
-              },
-              
-              required : ["userResponse", "newSummary"]
-              
-            }
-          }]
+      let messagesList = [];
+      for (const message of conversation_already.messages) {
+        messagesList.push({
+          role: message.role,
+          content: message.content,
         });
-        
-        let toolBlock
-        for (let block of response.content) 
-          {
+      }
+      const response = await client_anthropic.messages.create({
+        model: "claude-sonnet-4-5",
+        max_tokens: 1000,
+        messages: messagesList,
+      });
 
-          if (block.type === "tool_use") 
-            {
-            toolBlock = block
-            break
-          }
+      if (!response || !response.content) {
+        res.status(400).json({
+          error: "The Anthropic model did not give any textual response",
+        });
+        return;
+      }
 
+      for (const block of response.content) {
+        if (block.type == "text") {
+          response_string = response_string + block.text;
         }
-
-        
-        
-        if (!toolBlock || toolBlock.name != "response_template") {
-          res.status(400).json({
-            error: "The Anthropic model did not give any textual response",
-          });
-          return;
-        }
-        
-        
-        
-        response_string = toolBlock.input.userResponse;
-        conversation_already.summary = toolBlock.input.newSummary;
-      
+      }
     } else if (model == "chatgpt") {
       try {
-
-    const response = await client_openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
-            past chats summary: ${conversation_already.summary || "none"}
-            
-            task:
-            1 Answer the user's question
-            2 Update the summary to include this new interaction
-          `
-        },
-        { role: "user", content: message }
-      ],
-      response_format: {
-
-        type: "json_schema",
-
-        json_schema: {
-          name: "contextual_memory_template",
-          strict: true,
-          schema: {
-
-            type: "object",
-
-            properties: 
-            {
-              userResponse: { type: "string" },
-              newSummary: { type: "string" }
-            },
-
-            required: ["userResponse", "newSummary"],
-            // this is rquird for strict rule foolowing
-            additionalProperties: false
-          }
+        let messageList = [];
+        for (const message of conversation_already.messages) {
+          messageList.push({
+            role: message.role,
+            content: message.content,
+          });
         }
-      }
-    });
-
-    const answer = JSON.parse(response.choices[0].message.content);
-
-    response_string = answer.userResponse;
-    conversation_already.summary = answer.newSummary;
-
-    }
-    catch (error) {
-        console.log(error)
-    }
-    } else if (model == "gemini") {
-      try {
-        
-        
-        const response = await client_google.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents : [{
-            role : "user",
-            parts : [{
-              text : `
-              Previous summary  ${conversation_already.summary || "none"}
-              
-              
-              Task: Return a JSON object with
-               "userResponse"  => Provide a direect response to the user.
-              "newSummary"  => Update summary of the conversation.
-
-              format : 
-              {
-               "userResponse" : <User response>
-               "newSummary" : <new summary>
-              }
-              `
-            },
-          ]
-          },
-              {
-            role : "user",
-            parts : [{
-              text : message
-            }]
-
-          }],
-          generationConfig : {
-            responseMimeType: "application/json",
-            responseSchema: {
-              
-              type: "object",
-              
-              properties: 
-              {
-                userResponse: { type: "string" },
-                
-                newSummary: { type: "string" }
-              },
-              
-              required: [ "userResponse" , "newSummary"]
-            },
-          }
+        const response = await client_openai.responses.create({
+          model: "gpt-4.1-mini",
+          input: messageList,
         });
-        
-        if (!response) {
+
+        // console.log(response);
+
+        if (!response || !response.output_text) {
           res.status(400).json({
-            error: "The Google model did not give any textual response",
+            error: "The OpenAI model did not give any textual response",
           });
           return;
         }
-        console.log(response)
-        console.log(response.candidates[0])
-        // console.log(response.candidates[0].content)
-        // const result_parsed = JSON.parse(response.candidates[0].content.parts[0].text)
-        const result_parsed = JSON.parse(response.text)
-        
-        response_string = result_parsed.userResponse;
-        conversation_already.summary = result_parsed.newSummary;
+
+        response_string = response.output_text;
       } catch (error) {
-        res.status(500).json({
-          err : error.message
-        })
+        console.log(error);
       }
+    } else if (model == "gemini") {
+      let messageList = [];
+      for (const message of conversation_already.messages) {
+        messageList.push({
+          role: message.role == "user" ? "user" : "model",
+          parts: [
+            {
+              text: message.content,
+            },
+          ],
+        });
+      }
+      const response = await client_google.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: messageList,
+      });
+
+      if (!response) {
+        res.status(400).json({
+          error: "The Google model did not give any textual response",
+        });
+        return;
+      }
+
+      response_string = response.text;
     }
-
-    // i am using a local model gemma:2b for testing purposes as API free trial
+    // i am using a local model gemma and mistral for testing purposes as API free trial
     // ran out
-    else if (model == "gemma" || model=="mistral") {
+    else if (model == "mistral" || model == "gemma") {
       try {
-
-    const response = await ollama.chat({
-
-      model: ((model == "gemma") ? "gemma:2b":"mistral:7b"),
-      messages: [
-        {
-          role: "system",
-          content: `
-            past content summary: ${conversation_already.summary || "none"}
-            
-            task => 
-            1 give response to current user question
-            2 update the sumamary to include this interaefction.
-            
-            respond in JSON strictly
+        let messageList = [{
+          role : "system",
+          content : `This is summary of previous chats with user(it will be empty if this is the first chat with the user): ${conversation_already.summary}
           `
-        },
-        { role: "user", content: message }
-      ],
-      stream: false,
-      format: {
-        type: "object",
+        }];
+        for (const message of conversation_already.messages) {
+          messageList.push({
+            role: message.role,
+            content: message.content,
+          });
+        }
 
-        properties: 
+        const response = await ollama.chat({
+            model: ((model == "mistral") ? "mistral:7b":"gemma:2b"),
+            messages: messageList,
+            stream: false,
+          })
+
         
-      {
-         userResponse: { type: "string" },
-         newSummary: { type: "string" }
-      },
 
-      required: ["userResponse", "newSummary"]
-    },
-      options: { temperature: 0 }// it was in ollama documentatoin
-    });
-
-    const answer = JSON.parse(response.message.content);
-
-    response_string = answer.userResponse;
-    conversation_already.summary = answer.newSummary;
+        response_string = response.message.content;
       
        
-      } catch (error) {
+      } 
+      catch (error) {
         res.status(400).json({
-          err : error.message
+          err: error.message,
         });
         return;
       }
@@ -483,6 +443,7 @@ const handleChat = async (req, res) => {
         model,
       });
 
+      
 
       await conversation_already.save();
     } catch (error) {
@@ -493,18 +454,47 @@ const handleChat = async (req, res) => {
       return;
     }
 
+
     res.status(200).json({
       chatId,
       model,
       message: response_string,
     });
+
+    // after backend has sent response then update the current summery using a local model
+    try {
+      const new_summary = await ollama.chat({
+        model : process.env.DEFAULT_SUMMERY_MODEL,
+        messages : [{
+          role : "system",
+          content : `Take the previous summery ,current user question and your response to make a new summary(less than 150 words response) of the conversation combining everything without starting with e.g "here's the new summery" 
+          Previous summery : ${conversation_already.summary}
+          User question : ${message}
+          Model Response : ${response_string}
+          
+          NOTE :- Only include the key details and NOT everything in detail and make it SHORT
+          NOTE :- Do not include heaters or footers like "Sure heres your summary.." or any reference to this system prompts 
+          `
+
+          
+      }]
+      })
+
+      conversation_already.summary = new_summary.message.content
+    } 
+    catch (error) {
+      console.log("Could not develop summery\n"+error)
+    }
+
+    await conversation_already.save()
+
+
     return;
   } catch (error) {
     res
       .status(500)
       .json({ message: "Error handling chat", error: error.message });
   }
-  return;
 };
 
 
@@ -535,7 +525,6 @@ const handleChat = async (req, res) => {
 
 // ========== controller to allow user to get past chats Title when
 // landing on screen1
-
 
 const getConversationTitle = async (req, res) => {
   try {
