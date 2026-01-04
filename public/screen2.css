@@ -327,7 +327,7 @@ div.response {
   margin-bottom: 23px;
 }
 
-div.question >  hr{
+div.response >  hr{
   /* display: none; */
   animation: loading 2s linear infinite;
 }
