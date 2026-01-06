@@ -1,7 +1,6 @@
 //-------------necessary imports
 const dotenv = require("dotenv");
 dotenv.config();
-const Anthropic = require("@anthropic-ai/sdk");
 const OpenAI = require("openai");
 const { GoogleGenAI  } = require("@google/genai");
 const ollama = require("ollama").default
@@ -322,7 +321,7 @@ const handleChat = async (req, res) => {
       return;
     }
 
-    //-------- If the model choosen by the user was Claude
+    //-------- If the model choosen by the user was Cohere
 
     if (model == "cohere") {
       let messagesList = [{
@@ -516,6 +515,7 @@ const handleChat = async (req, res) => {
 
     return;
   } catch (error) {
+    console.log(error)
     res
       .status(500)
       .json({ message: "Error handling chat", error: error.message });

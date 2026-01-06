@@ -1,35 +1,75 @@
-Please go through the following steps in order to run the project
+## 🚀 Getting Started: Project Setup
 
-1 Install Ollama on your device
+Follow these steps in the exact order to set up and run the environment on your local machine.
 
-2 Install the lightweight `gemma:2b` and `mistral:7b` and `mxbai-embed-large` models in your Ollama 
-by 
-`ollama pull gemma:2b`
-`ollama pull mistral:7b`
-`ollama pull mxbai-embed-large`
+### 1. Install Ollama
 
-3 After it is installed start the ollama server first
-`ollama serve`
+Download and install the Ollama client for Windows to host your local models.
 
-4 Give a valid OpenAI, Google, Anthropic api key in the `.env`
+* **Link:** [Download Ollama for Windows](https://ollama.com/download/windows)
 
-5 Run the file called `generateEmbedding-openai.js` by `node ./api/generateEmbedding-openai.js`
+### 2. Install Project Dependencies
 
-6 Start the project at by `npm start`
+Navigate to your project folder in the terminal and run:
+
+```bash
+npm install
+
+```
+
+### 3. Configure Environment Variables
+
+Locate the `.env.example` file in the root directory.
+
+1. Enter your valid **OpenAI**, **Google**, and **Cohere** API keys.
+2. Rename the file from `.env.example` to `.env`.
+
+### 4. Download Local Models
+
+Open **PowerShell** and pull the required lightweight models and the embedding engine:
+
+```powershell
+ollama pull gemma:2b
+ollama pull mistral:7b
+ollama pull mxbai-embed-large
+
+```
+
+### 5. Start the Ollama Server
+
+Initialize the local server to allow the application to communicate with your models:
+
+```powershell
+ollama serve
+
+```
+
+### 6. Start the Ollama Server
+
+Change your internet to Phone Hotspot or use a VPN
+since `Cohere API` is banned on `IITG_CONNECT`
 
 
+### 7. Launch the Application
 
+Start the project by running:
 
+```bash
+npm start
 
+```
 
+---
 
+## 📌 Technical Notes
 
+### AI-Generated Model Personalities
 
+Because identifying the specific strengths of every model is a specialized task, I utilized AI to generate the `examples` and `keywords` found in `embeddingPhrases.js`, `embeddingPhrases-openai.js`, and `keywords.js`.
 
-## NOTE
-since i do not have any idea of what the personality of any model is, i have used AI for generating the `examples` corresponding to each AI in the `embeddingPhrases.js` and `embeddingPhrases-openai.js` for e.g for claude :- `help me write this code` is an example as claude is good in coding , i did not know this therefore this portion was AI generated
+* **Example:**  Cohere is assigned phrases like *"help me reindex this list"* due to its reindexing proficiency.
+* **Keyword Logic:** Keywords like *"summarise"* were generated for **Gemma:2b** to help the semantic router categorize tasks effectively.
 
-Also the `keywords` for each model in the `keywords.js` is AI generated as i do not know what are the keywords for each AI and their personality e.g it generated `summarise` for `gemma:2b` model which is impoosible to figure out myself as i am not a MODEL engineer
+### Model Updates
 
-
-NOTE => I realised after the `claude` was replaced with `cohere` thereofore i have made the corrections on code but in Video i have used `claude` only
+* **Model Switch:** Please note that **Claude** has been replaced with **Cohere** within the codebase.
